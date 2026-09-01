@@ -30,10 +30,11 @@ pub struct Encoder<'a, A: Pin, B: Pin> {
     _b: PhantomData<B>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum EncoderReading {
     TowardsA,
     TowardsB,
+    Both,
     Still,
 }
 
@@ -55,6 +56,7 @@ impl<'a, A: Pin, B: Pin> Encoder<'a, A, B> {
     pub fn get_reading(&self) -> EncoderReading {
         // TODO: are A and B mutually exclusive?
         match (self.a.get_level(), self.b.get_level()) {
+            (Self::ROTATED_LEVEL, Self::ROTATED_LEVEL) => EncoderReading::Both,
             (Self::ROTATED_LEVEL, _) => EncoderReading::TowardsA,
             (_, Self::ROTATED_LEVEL) => EncoderReading::TowardsB,
             _ => EncoderReading::Still,
@@ -68,6 +70,7 @@ async fn main(_spawner: Spawner) {
     info!("Hello World!");
 
     let mut led = Output::new(p.PC13, Level::High, Speed::Low);
+    led.set_high();
     // let pwm_pin = PwmPin::new(p.PA0, PushPull);
     // let mut pwm = SimplePwm::new(
     //     p.TIM2,
@@ -80,15 +83,17 @@ async fn main(_spawner: Spawner) {
     // );
     // pwm.set_duty(Channel::Ch1, pwm.max_duty_cycle() / 2);
 
-    let enc1 = Encoder::new(p.PA2, p.PA0);
+    let enc1 = Encoder::new(p.PC14, p.PC15);
 
     loop {
-        led.set_high();
-        Timer::after_millis(300).await;
+        // led.set_high();
+        // Timer::after_millis(300).await;
 
-        led.set_low();
-        Timer::after_millis(300).await;
+        // led.set_low();
+        // Timer::after_millis(300).await;
         let reading = enc1.get_reading();
-        defmt::dbg!(defmt::Debug2Format(&reading));
+        if reading != EncoderReading::Still {
+            defmt::dbg!(defmt::Debug2Format(&reading));
+        }
     }
 }

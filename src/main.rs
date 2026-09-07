@@ -1,19 +1,14 @@
 #![no_std]
 #![no_main]
 
-use core::{marker::PhantomData, ops::Deref};
+use core::marker::PhantomData;
 
-use defmt::{todo, *};
+use defmt::*;
 use embassy_executor::Spawner;
 use embassy_stm32::{
-    Config, Peri, gpio::{AnyPin, Flex, Input, Level, Output, OutputType::PushPull, Pin, Pull, Speed}, pac::gpio::vals::Pupdr::PULL_DOWN, time::Hertz, timer::{
-        Channel,
-        low_level::CountingMode,
-        simple_pwm::{PwmPin, SimplePwm},
-    },
+    Peri, gpio::{Input, Level, Output, Pin, Pull, Speed},
 };
 use embassy_time::Timer;
-use embedded_hal::{Pwm, digital::v2::InputPin};
 use {defmt_rtt as _, panic_probe as _};
 
 // fn encoder_read(pin: Peri<u16>) {
@@ -63,11 +58,11 @@ impl<'a, A: Pin, B: Pin> Encoder<'a, A, B> {
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    let mut p = embassy_stm32::init(Default::default());
+    let p = embassy_stm32::init(Default::default());
     info!("Hello World!");
 
     let mut led = Output::new(p.PC13, Level::High, Speed::Low);
-    let mut key = Input::new(p.PA0, Pull::Up);
+    let key = Input::new(p.PA0, Pull::Up);
     
     led.set_low();
 

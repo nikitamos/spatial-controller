@@ -3,7 +3,7 @@ use core::{
     sync::atomic::{AtomicU8, Ordering},
 };
 
-use defmt::{Debug2Format, info, warn};
+use defmt::{Debug2Format, error, info, warn};
 use embassy_stm32::{
     Peri,
     interrupt::typelevel::Binding,
@@ -17,9 +17,32 @@ use embassy_usb::{
     },
     control::OutResponse,
 };
-use usbd_hid::descriptor::{MouseReport, SerializedDescriptor};
+use usbd_hid::descriptor::{AsInputReport, MouseReport, SerializedDescriptor, gen_hid_descriptor};
 
 static HID_PROTOCOL_MODE: AtomicU8 = AtomicU8::new(HidProtocolMode::Boot as u8);
+
+#[gen_hid_descriptor(
+    (collection = APPLICATION, usage_page = GENERIC_DESKTOP, usage = MULTI_AXIS_CONTROLLER) = {
+        // (collection = PHYSICAL, usage = POINTER) = {
+        (usage_page = GENERIC_DESKTOP,) = {
+            (usage = 0x33,) = {
+                #[item_settings(data,variable,relative)] rx=input
+            };
+            (usage = 0x34,) = {
+                #[item_settings(data,variable,relative)] ry=input
+            };
+            (usage = 0x35,) = {
+                #[item_settings(data,variable,relative)] rz=input;
+            };
+        };
+    }
+)]
+#[derive(Default)]
+pub struct RotationReport {
+    pub rx: i8,
+    pub ry: i8,
+    pub rz: i8,
+}
 
 pub struct UsbBuffers<
     const EP_OUT: usize = 256,
@@ -71,13 +94,13 @@ pub fn init<'p, T: Instance>(
 
     // Create embassy-usb Config
     let mut config = embassy_usb::Config::new(0xc0de, 0xcafe);
-    config.manufacturer = Some("Embassy");
-    config.product = Some("HID mouse example");
-    config.serial_number = Some("67");
+    config.manufacturer = Some("Nikand");
+    config.product = Some("Spatial Controller");
+    config.serial_number = Some("0");
     config.composite_with_iads = false;
-    config.device_class = 0;
-    config.device_sub_class = 0;
-    config.device_protocol = 0;
+    config.device_class = 0x03; // HID device
+    config.device_sub_class = 0; // No subclass
+    config.device_protocol = 0; // No protocol
 
     // Create embassy-usb DeviceBuilder using the driver and config.
     // It needs some buffers for building the descriptors.
@@ -93,15 +116,16 @@ pub fn init<'p, T: Instance>(
 
     // Create classes on the builder.
     let config = embassy_usb::class::hid::Config {
-        report_descriptor: MouseReport::desc(),
+        report_descriptor: RotationReport::desc(),
         request_handler: Some(request_handler),
         poll_ms: 60,
         max_packet_size: 8,
         hid_subclass: HidSubclass::Boot,
         hid_boot_protocol: HidBootProtocol::Mouse,
     };
+    info!("{}", config.report_descriptor);
 
-    let mut writer = HidWriter::<_, 5>::new(&mut builder, state, config);
+    let mut writer = HidWriter::<_, 20>::new(&mut builder, state, config);
 
     // Build the builder.
     let usb = builder.build();
@@ -110,27 +134,54 @@ pub fn init<'p, T: Instance>(
 
     // Do stuff with the class!
     let hid_fut = async move {
-        let mut y: i8 = 5;
-        loop {
-            Timer::after_millis(500).await;
+        let mut x_total = 0;
+        let mut y_total = 0;
+        let mut z_total = 0;
 
-            y = -y;
+        let mut buffer = [0u8; core::mem::size_of::<RotationReport>()];
+        loop {
+            Timer::after_millis(100).await;
+            const ROTATION:i8 = 6;
+
+            let report = if x_total == 90 {
+                if y_total == 90 {
+                    if z_total == 90 {
+                        x_total = 0;
+                        y_total = 0;
+                        z_total = 0;
+                        RotationReport::default()
+                    } else {
+                        z_total += ROTATION;
+                        RotationReport {
+                            rz: ROTATION,
+                            ..Default::default()
+                        }
+                    }
+                } else {
+                    y_total += ROTATION;
+                    RotationReport {
+                        ry: ROTATION,
+                        ..Default::default()
+                    }
+                }
+            } else {
+                x_total += ROTATION;
+                RotationReport {
+                    rx: ROTATION,
+                    ..Default::default()
+                }
+            };
+            let size = match report.serialize(&mut buffer) {
+                Ok(size) => size,
+                Err(_) => {error!("failed to serialize report: buffer overflow"); continue;}
+            };
 
             if HID_PROTOCOL_MODE.load(Ordering::Relaxed) == HidProtocolMode::Boot as u8 {
-                let buttons = 0u8;
-                let x = 0i8;
-                match writer.write(&[buttons, x as u8, y as u8]).await {
+                match writer.write(&buffer[..size]).await {
                     Ok(()) => {}
                     Err(e) => warn!("Failed to send boot report: {:?}", Debug2Format(&e)),
                 }
             } else {
-                let report = MouseReport {
-                    buttons: 0,
-                    x: 0,
-                    y,
-                    wheel: 0,
-                    pan: 0,
-                };
                 match writer.write_serialize(&report).await {
                     Ok(()) => {}
                     Err(e) => warn!("Failed to send report: {:?}", Debug2Format(&e)),

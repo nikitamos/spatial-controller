@@ -5,14 +5,19 @@ use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_futures::join::join;
+use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
-use embassy_stm32::{Config, bind_interrupts, peripherals, usb};
+use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
 use panic_probe as _;
 
 use spatial::usb::MyRequestHandler;
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
+    I2C1_EV => i2c::EventInterruptHandler<peripherals::I2C1>;
+    I2C1_ER => i2c::ErrorInterruptHandler<peripherals::I2C1>;
+    DMA1_STREAM0 => dma::InterruptHandler<peripherals::DMA1_CH0>;
+    DMA1_STREAM1 => dma::InterruptHandler<peripherals::DMA1_CH1>;
 });
 
 #[embassy_executor::main]
@@ -40,6 +45,17 @@ async fn main(_spawner: Spawner) {
     }
     let p = embassy_stm32::init(config);
     info!("initialized");
+
+    let i2c = I2c::new(
+        p.I2C1,
+        p.PB6,
+        p.PB7,
+        p.DMA1_CH1,
+        p.DMA1_CH0,
+        Irqs,
+        i2c::Config::default(),
+    );
+    
 
     let mut buffers = Default::default();
     let mut handler = MyRequestHandler {};

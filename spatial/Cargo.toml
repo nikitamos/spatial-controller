@@ -12,7 +12,7 @@ embassy-stm32 = { version = "0.6.0", features = [
     "unstable-pac",
     "memory-x",
     "time-driver-any",
-    # "exti",
+    "exti",
 ] }
 
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }

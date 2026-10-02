@@ -2,3 +2,4 @@
 
 pub mod usb;
 pub mod encoder;
+pub mod magnetometer;

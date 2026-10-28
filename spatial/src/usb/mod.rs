@@ -5,17 +5,13 @@ use core::{
 
 use defmt::{Debug2Format, error, info, warn};
 use embassy_stm32::{
-    Peri,
-    interrupt::typelevel::Binding,
-    usb::{self, DmPin, DpPin, Driver, Instance},
+    Peri, interrupt::typelevel::Binding, peripherals, usb::{self, DmPin, DpPin, Driver, Instance},
 };
 use embassy_time::Timer;
 use embassy_usb::{
-    UsbDevice,
-    class::hid::{
-        HidBootProtocol, HidProtocolMode, HidSubclass, HidWriter, ReportId, RequestHandler,
-    },
-    control::OutResponse,
+    Builder, UsbDevice, class::hid::{
+        HidBootProtocol, HidProtocolMode, HidReaderWriter, HidSubclass, HidWriter, ReportId, RequestHandler,
+    }, control::OutResponse,
 };
 use usbd_hid::descriptor::{AsInputReport, MouseReport, SerializedDescriptor, gen_hid_descriptor};
 
@@ -51,10 +47,10 @@ pub struct UsbBuffers<
     const BOS: usize = 256,
     const CTRL: usize = 64,
 > {
-    ep_out: [u8; EP_OUT],
-    config: [u8; CONFIG],
-    bos: [u8; BOS],
-    ctrl: [u8; CTRL],
+    pub ep_out: [u8; EP_OUT],
+    pub config: [u8; CONFIG],
+    pub bos: [u8; BOS],
+    pub ctrl: [u8; CTRL],
 }
 
 impl<const EP_OUT: usize, const CONFIG: usize, const BOS: usize, const CTRL: usize> Default
@@ -121,8 +117,8 @@ pub fn init<'p, T: Instance>(
         request_handler: Some(request_handler),
         poll_ms: 60,
         max_packet_size: 8,
-        hid_subclass: HidSubclass::Boot,
-        hid_boot_protocol: HidBootProtocol::Mouse,
+        hid_subclass: HidSubclass::No,
+        hid_boot_protocol: HidBootProtocol::None,
     };
     info!("{}", config.report_descriptor);
 

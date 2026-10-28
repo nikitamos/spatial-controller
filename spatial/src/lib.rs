@@ -12,7 +12,5 @@ pub trait ErrorSink {}
 /// fetching the data from sensors, processing it, reporting errors,
 /// sending the data over USB, etc.
 pub trait Module {
-    type ModuleConfig;
-    fn configure(config: Self::ModuleConfig) -> Self;
-    fn run_on(spawner: &embassy_executor::Spawner);
+    fn run_on(self, spawner: &embassy_executor::Spawner) -> impl core::future::Future<Output = ()>;
 }

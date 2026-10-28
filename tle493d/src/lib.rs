@@ -1,8 +1,9 @@
 #![no_std]
 
+use core::error::Error;
+
 use embedded_hal_async::{
-    delay,
-    i2c::{self, SevenBitAddress},
+    delay::{self, DelayNs}, i2c::{self, SevenBitAddress, ErrorType as AsyncI2cError},
 };
 use embedded_interfaces::{
     TransportError,
@@ -20,13 +21,13 @@ use crate::registers::{
     TempRegister, TemperatureCompensation, TriggerOptions, UpdateRate,
 };
 
-#[derive(thiserror::Error)]
+#[derive(thiserror::Error, Debug)]
 pub enum MagnetometerError<I> {
     NotReady,
     BusError(#[from] I),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, defmt::Format, PartialEq, Eq)]
 pub struct RawMeasurement {
     pub bx: i16,
     pub by: i16,
@@ -45,7 +46,7 @@ fn merge_unsigned(msb: u8, lsb: u8) -> u16 {
 pub struct TLE493DW2B6<I, D>
 where
     I: embedded_interfaces::registers::RegisterInterfaceAsync,
-    D: embedded_hal_async::delay::DelayNs,
+    D: DelayNs,
 {
     interface: I,
     delay: D,
@@ -54,18 +55,27 @@ where
 
 #[derive(Debug, Default)]
 pub struct Config {
-    temp_compensation: TemperatureCompensation,
-    disable_temp: bool,
-    update_rate: UpdateRate,
-    trigger_options: TriggerOptions,
-    short_range: bool,
+    pub temp_compensation: TemperatureCompensation,
+    pub disable_temp: bool,
+    pub update_rate: UpdateRate,
+    pub trigger_options: TriggerOptions,
+    pub short_range: bool,
 }
 
 impl<I, D> TLE493DW2B6<I2cDeviceAsync<I, i2c::SevenBitAddress>, D>
 where
-    I: i2c::I2c<i2c::SevenBitAddress> + i2c::Error,
-    D: embedded_hal_async::delay::DelayNs,
+    I: i2c::I2c<i2c::SevenBitAddress>,
+    D: DelayNs,
 {
+
+    pub async fn new_unconfigured(interface: I, id: DeviceId, delay: D) -> Self{
+        Self {
+            interface: I2cDeviceAsync::new(interface, id.i2c_address()),
+            delay,
+            address: id,
+        }
+    }
+
     pub async fn new(
         interface: I,
         id: DeviceId,
@@ -137,11 +147,18 @@ where
     }
 
     async fn reset(&mut self) {
-        let _ = self.i2c_write(&[0xFF]).await;
-        let _ = self.i2c_write(&[0xFF]).await;
-        let _ = self.i2c_write(&[0x00]).await;
-        let _ = self.i2c_write(&[0x00]).await;
+        defmt::debug!("reset started");
+        let _ = self.i2c_write(&[0xFF]).await.inspect_err(Self::log);
+        let _ = self.i2c_write(&[0xFF]).await.inspect_err(Self::log);
+        let _ = self.i2c_write(&[0x00]).await.inspect_err(Self::log);
+        let _ = self.i2c_write(&[0x00]).await.inspect_err(Self::log);
         self.delay.delay_us(30).await;
+        defmt::debug!("reset finished");
+    }
+
+    #[track_caller]
+    fn log<E1: core::fmt::Debug>(e: &E1) {
+        defmt::error!("Error: {}", defmt::Debug2Format(e));
     }
 
     fn raw_i2c(&mut self) -> &mut I {
@@ -167,7 +184,7 @@ where
                 TransportError::Unexpected(u) => {
                     panic!("unexpected error: {u:?}")
                 }
-                TransportError::Bus(_) => todo!(),
+                TransportError::Bus(e) => e,
             })
     }
 

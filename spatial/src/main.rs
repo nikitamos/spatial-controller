@@ -5,12 +5,22 @@ use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_futures::join::join;
+use embassy_stm32::gpio::OutputType::PushPull;
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
-use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
+use embassy_stm32::timer::Channel;
+use embassy_stm32::timer::low_level::CountingMode;
+use embassy_stm32::timer::simple_pwm::{PwmPin, SimplePwm};
+use embassy_stm32::{Config, Peripherals, bind_interrupts, dma, i2c, peripherals, usb};
+use embassy_time::Timer;
 use panic_probe as _;
 
+// use embedded_hal::Pwm;
+
+
 use spatial::usb::MyRequestHandler;
+use tle493d::TLE493DW2B6;
+use tle493d::registers::DeviceId;
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
@@ -46,16 +56,52 @@ async fn main(_spawner: Spawner) {
     let p = embassy_stm32::init(config);
     info!("initialized");
 
-    let i2c = I2c::new(
-        p.I2C1,
-        p.PB6,
-        p.PB7,
-        p.DMA1_CH1,
-        p.DMA1_CH0,
-        Irqs,
-        i2c::Config::default(),
-    );
-    
+    // let delay = ;
+    let mut i2c_cfg = i2c::Config::default();
+    i2c_cfg.frequency = Hertz::khz(100);
+    // i2c_cfg.gpio_speed = embassy_stm32::gpio::Speed::Medium;
+    i2c_cfg.scl_pullup = true;
+    i2c_cfg.sda_pullup = true;
+    let mut i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
+    info!("i2c created");
+
+    defmt::debug!("Scanning I2C bus...");
+    for address in 0x03..0x78 {
+        match i2c.write(address, &[0x00]).await {
+            Ok(()) => {
+                defmt::debug!("Found device at address: 0x{:02X}", address);
+            }
+            Err(e) => {
+                defmt::debug!("No I2C device at 0x{:02X}: {}", address, Debug2Format(&e));
+            }
+        }
+    }
+    defmt::debug!("Scan finished.");
+
+    // let mut mag = TLE493DW2B6::new(
+    //     i2c,
+    //     tle493d::registers::DeviceId::A0,
+    //     embassy_time::Delay,
+    //     tle493d::Config {
+    //         temp_compensation: tle493d::registers::TemperatureCompensation::NoCompensation,
+    //         disable_temp: false,
+    //         update_rate: tle493d::registers::UpdateRate::F97Hz,
+    //         trigger_options: tle493d::registers::TriggerOptions::NoTrigger,
+    //         short_range: false,
+    //     },
+    // )
+    // .await
+    // .inspect_err(|e| defmt::error!("error creating: {}", Debug2Format(e)))
+    // .unwrap();
+
+    let mut mag =  TLE493DW2B6::new_unconfigured(i2c, DeviceId::A0, embassy_time::Delay).await;
+    let r = mag.try_read_raw_measurement().await;
+    defmt::info!("{}", Debug2Format(&r));
+
+    Timer::after_millis(100).await;
+    defmt::info!("created, awaited");
+    let x = mag.try_read_raw_measurement().await;
+    defmt::info!("mes={}", Debug2Format(&x));
 
     let mut buffers = Default::default();
     let mut handler = MyRequestHandler {};
@@ -74,3 +120,7 @@ async fn main(_spawner: Spawner) {
     // If we had made everything `'static` above instead, we could do this using separate tasks instead.
     join(usb.run(), hid_fut).await;
 }
+
+// fn make_i2c(p: Peripherals) -> impl embedded_hal::i2c::ErrorType {
+
+// }

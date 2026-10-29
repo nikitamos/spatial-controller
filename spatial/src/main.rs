@@ -7,18 +7,20 @@ use embassy_executor::Spawner;
 use embassy_futures::join::join;
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
-use embassy_stm32::usb::Driver;
 use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
 use embassy_sync::once_lock::OnceLock;
 use embassy_usb::Builder;
+use embassy_usb::descriptor::descriptor_type::BOS;
 use panic_probe as _;
 
 // use embedded_hal::Pwm;
 
-use spatial::Module;
-use spatial::orientation::{OrientationModule, OrientationModuleConfig};
+use spatial::orientation::{
+    OrientationModule, OrientationModuleConfig, OrientationModuleStaticStorage,
+};
 use spatial::usb::UsbBuffers;
 use spatial::usb::hid_helpers::HidInterfaceStorage;
+use spatial::{Module, ModuleBuilder, ModuleCollection, StaticStorage, init_module};
 use tle493d::TLE493DW2B6;
 use tle493d::registers::DeviceId;
 
@@ -30,7 +32,8 @@ bind_interrupts!(struct Irqs {
     DMA1_STREAM1 => dma::InterruptHandler<peripherals::DMA1_CH1>;
 });
 
-static DRIVER: OnceLock<Driver<'static, peripherals::USB_OTG_FS>> = OnceLock::new();
+type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
+static DRIVER: OnceLock<Driver> = OnceLock::new();
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -94,36 +97,64 @@ async fn main(spawner: Spawner) {
 
     // ===== USB setup =====
 
-    let mut buffers: UsbBuffers = Default::default();
-    let mut config = embassy_stm32::usb::Config::default();
-    config.vbus_detection = false;
+    let driver = {
+        static mut EP_OUT: [u8; 256] = [0; 256];
+        let mut config = embassy_stm32::usb::Config::default();
+        config.vbus_detection = false;
+        let mut storage = HidInterfaceStorage::default();
+        Driver::new_fs(
+            // this operation can not fail
+            p.USB_OTG_FS,
+            Irqs,
+            p.PA12,
+            p.PA11,
+            // SAFETY: no other reference is created to the static variable
+            unsafe { (&raw mut EP_OUT).as_mut_unchecked() },
+            config,
+        )
+    };
 
-    let mut storage = HidInterfaceStorage::default();
-    let driver = Driver::new_fs(
-        p.USB_OTG_FS,
-        Irqs,
-        p.PA12,
-        p.PA11,
-        &mut buffers.ep_out,
-        config,
-    );
+    static mut BUFFERS: UsbBuffers = UsbBuffers::ZEROED;
+    // let driver = *DRIVER.get().await;
     let config = make_usb_config();
 
-    let mut usb_builder = Builder::new(
-        driver,
-        config,
-        &mut buffers.config,
-        &mut buffers.bos,
-        &mut [], // no msos
-        &mut buffers.ctrl,
-    );
+    let mut usb_builder = unsafe {
+        static mut CONFIG_BUF: [u8; 256] = [0; 256];
+        static mut BOS_BUF: [u8; 256] = [0; 256];
+        static mut CTRL_BUF: [u8; 64] = [0; 64];
+        Builder::new(
+            driver,
+            config,
+            // SAFETY: static variables are accessed only via mutable references
+            // created here. No other references are created
+            (&raw mut CONFIG_BUF).as_mut_unchecked(),
+            (&raw mut BOS_BUF).as_mut_unchecked(),
+            &mut [], // no msos
+            (&raw mut CTRL_BUF).as_mut_unchecked(),
+        )
+    };
 
-    let x = OrientationModule::new(&mut usb_builder, &mut storage);
+    // let x = OrientationModule::new(&mut usb_builder, &mut storage);
+    // static mut STORAGE:
+    //     <OrientationModule<Driver<'_, peripherals::USB_OTG_FS>> as Module>::Storage =
+    //     OrientationModuleStaticStorage::new();
+    // OrientationModule::initialize(OrientationModuleConfig::new(&mut usb_builder), &mut STORAGE);
+    // let mod1 = init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(&mut usb_builder));
+
+    let modules = create_modules(&mut usb_builder);
+
     let mut dev = usb_builder.build();
     debug!("buffer usage: {}", dev.buffer_usage());
 
-    join(x.run_on(&spawner), dev.run()).await;
+    join(dev.run(), modules.run(&spawner)).await;
     // x.run
+}
+
+fn create_modules<'a>(usb_builder: &'a mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
+    let modules = { 
+        init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),)
+    };
+    modules
 }
 
 fn make_usb_config() -> embassy_usb::Config<'static> {

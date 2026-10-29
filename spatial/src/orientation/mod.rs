@@ -1,9 +1,13 @@
+use core::{iter::Once, marker::PhantomData};
+
+use cortex_m::peripheral;
+use embassy_stm32::peripherals;
 use embassy_sync::once_lock::OnceLock;
 use embassy_time::Timer;
 use embassy_usb::{Builder, driver::Driver};
 
 use crate::{
-    Module,
+    Module, ModuleBuilder, StaticStorage,
     orientation::descriptor::RotationReport,
     usb::hid_helpers::{HidInterfaceStorage, UsbHidComm, UsbHidInterface},
 };
@@ -19,16 +23,6 @@ pub struct OrientationModule<'d, D: Driver<'d>> {
         { core::mem::size_of::<RotationReport>() },
     >,
     comm: UsbHidComm<RotationReport>,
-}
-
-impl<'b, 'd, D: Driver<'d>> OrientationModule<'d, D> {
-    pub fn new(builder: &'b mut Builder<'d, D>, storage: &'d mut HidInterfaceStorage<'d>) -> Self {
-        let (iface, comm) = UsbHidInterface::new(builder, storage);
-        Self {
-            interface: iface,
-            comm,
-        }
-    }
 }
 
 #[embassy_executor::task]
@@ -49,17 +43,45 @@ async fn usb_send_readings() {
 }
 
 pub struct OrientationModuleConfig<'b, 'd, D: Driver<'d>> {
-    storage: HidInterfaceStorage<'d>,
     builder: &'b mut Builder<'d, D>, // magnetometer: tle493d::TLE493DW2B6<embassy_stm32::i2c::I2c<'static, Async, Master>, embassy_time::Delay>
 }
 
-impl<'b, 'd, D: Driver<'d>> OrientationModuleConfig<'b, 'd, D> {
-    pub fn new(builder: &'b mut Builder<'d, D>) -> Self {
-        Self {
-            storage: Default::default(),
-            builder,
+impl<'b, 'd, D> ModuleBuilder for OrientationModuleConfig<'b, 'd, D>
+where
+    D: Driver<'d> + 'd,
+{
+    type Target = OrientationModule<'d, D>;
+    fn build(
+        self,
+        storage: &'static mut <OrientationModule<'d, D> as Module>::Storage,
+    ) -> OrientationModule<'d, D> {
+        let OrientationModuleConfig { builder } = self;
+        let (iface, comm) = UsbHidInterface::new(builder, &mut storage.hid);
+        OrientationModule {
+            interface: iface,
+            comm,
         }
     }
+}
+
+// impl<D: ModuleBuilder<OrientationModule<'static, 'static, D>
+
+impl<'b, 'd, D: Driver<'d>> OrientationModuleConfig<'b, 'd, D> {
+    pub fn new(builder: &'b mut Builder<'d, D>) -> Self {
+        Self { builder }
+    }
+}
+
+pub struct OrientationModuleStaticStorage<'d> {
+    hid: HidInterfaceStorage<'d>,
+    comm: OnceLock<UsbHidComm<RotationReport>>,
+}
+
+impl<'d> StaticStorage for OrientationModuleStaticStorage<'d> {
+    const DEFAULT: Self = Self {
+        hid: HidInterfaceStorage::new(),
+        comm: OnceLock::new(),
+    };
 }
 
 static COMM: OnceLock<UsbHidComm<RotationReport>> = OnceLock::new();
@@ -85,4 +107,6 @@ where
         }
         self.interface.serve(comm).await;
     }
+
+    type Storage = OrientationModuleStaticStorage<'d>;
 }

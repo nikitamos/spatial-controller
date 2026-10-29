@@ -5,13 +5,19 @@ use core::{
 
 use defmt::{Debug2Format, error, info, warn};
 use embassy_stm32::{
-    Peri, interrupt::typelevel::Binding, peripherals, usb::{self, DmPin, DpPin, Driver, Instance},
+    Peri,
+    interrupt::typelevel::Binding,
+    peripherals,
+    usb::{self, DmPin, DpPin, Driver, Instance},
 };
 use embassy_time::Timer;
 use embassy_usb::{
-    Builder, UsbDevice, class::hid::{
-        HidBootProtocol, HidProtocolMode, HidReaderWriter, HidSubclass, HidWriter, ReportId, RequestHandler,
-    }, control::OutResponse,
+    Builder, UsbDevice,
+    class::hid::{
+        HidBootProtocol, HidProtocolMode, HidReaderWriter, HidSubclass, HidWriter, ReportId,
+        RequestHandler,
+    },
+    control::OutResponse,
 };
 use usbd_hid::descriptor::{AsInputReport, MouseReport, SerializedDescriptor, gen_hid_descriptor};
 
@@ -51,6 +57,17 @@ pub struct UsbBuffers<
     pub config: [u8; CONFIG],
     pub bos: [u8; BOS],
     pub ctrl: [u8; CTRL],
+}
+
+impl<const EP_OUT: usize, const CONFIG: usize, const BOS: usize, const CTRL: usize>
+    UsbBuffers<EP_OUT, CONFIG, BOS, CTRL>
+{
+    pub const ZEROED: Self = Self {
+        ep_out: [0; EP_OUT],
+        config: [0; CONFIG],
+        bos: [0; BOS],
+        ctrl: [0; CTRL],
+    };
 }
 
 impl<const EP_OUT: usize, const CONFIG: usize, const BOS: usize, const CTRL: usize> Default
@@ -138,7 +155,7 @@ pub fn init<'p, T: Instance>(
         let mut buffer = [0u8; core::mem::size_of::<RotationReport>()];
         loop {
             Timer::after_millis(100).await;
-            const ROTATION:i8 = 6;
+            const ROTATION: i8 = 6;
 
             let report = if x_total == 90 {
                 if y_total == 90 {
@@ -170,7 +187,10 @@ pub fn init<'p, T: Instance>(
             };
             let size = match report.serialize(&mut buffer) {
                 Ok(size) => size,
-                Err(_) => {error!("failed to serialize report: buffer overflow"); continue;}
+                Err(_) => {
+                    error!("failed to serialize report: buffer overflow");
+                    continue;
+                }
             };
 
             if HID_PROTOCOL_MODE.load(Ordering::Relaxed) == HidProtocolMode::Boot as u8 {

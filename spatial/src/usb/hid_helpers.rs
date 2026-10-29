@@ -5,13 +5,9 @@ use embassy_futures::select::select;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
 use embassy_time::Timer;
 use embassy_usb::{
-    Builder,
-    class::hid::{
-        Config, HidBootProtocol, HidProtocolMode, HidReader, HidReaderWriter, HidSubclass,
-        ReportId, RequestHandler,
-    },
-    control::OutResponse,
-    driver::Driver,
+    Builder, class::hid::{
+        Config, HidBootProtocol, HidProtocolMode, HidReader, HidReaderWriter, HidSubclass, ReportId, RequestHandler, State,
+    }, control::OutResponse, driver::Driver,
 };
 use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
 
@@ -20,6 +16,14 @@ pub struct HidInterfaceStorage<'s> {
     // handler: GenericHidRequestHandler,
     state: embassy_usb::class::hid::State<'s>,
     // comm: UsbHidComm<T>,
+}
+
+impl<'s> HidInterfaceStorage<'s> {
+    pub const fn new() -> Self {
+        Self {
+            state: State::new()
+        }
+    }
 }
 
 pub struct UsbHidInterface<

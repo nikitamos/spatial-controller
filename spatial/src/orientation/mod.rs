@@ -30,7 +30,7 @@ impl ModuleBuilder for OrientationModuleConfig {
     type Target = OrientationModule;
     fn build(
         self,
-        storage: &'static mut <OrientationModule as Module>::Storage,
+        _storage: &'static mut <OrientationModule as Module>::Storage,
     ) -> OrientationModule {
         OrientationModule { sink: self.sink }
     }
@@ -51,7 +51,7 @@ impl StaticStorage for OrientationModuleStaticStorage {
 }
 
 impl Module for OrientationModule {
-    async fn run_on(mut self, spawner: &embassy_executor::Spawner) {
+    async fn run_on(self, spawner: &embassy_executor::Spawner) {
         let comm = self.sink;
         match fetch_readings(comm) {
             Ok(token) => spawner.spawn(token),

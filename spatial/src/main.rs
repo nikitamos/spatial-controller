@@ -8,7 +8,6 @@ use embassy_futures::join::join;
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
 use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
-use embassy_sync::once_lock::OnceLock;
 use embassy_usb::Builder;
 use panic_probe as _;
 
@@ -29,7 +28,6 @@ bind_interrupts!(struct Irqs {
 });
 
 type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
-static DRIVER: OnceLock<Driver> = OnceLock::new();
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {

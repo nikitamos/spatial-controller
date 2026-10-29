@@ -1,6 +1,6 @@
 use usbd_hid::descriptor::gen_hid_descriptor;
-use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
-use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout, Unaligned};
+use usbd_hid::descriptor::SerializedDescriptor;
+use zerocopy::{Immutable, IntoBytes, KnownLayout, Unaligned};
 
 use crate::usb::HidReportWithId;
 

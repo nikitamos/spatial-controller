@@ -3,9 +3,9 @@ use embassy_time::Timer;
 use embassy_usb::{
     Builder,
     class::hid::{Config, HidBootProtocol, HidReaderWriter, HidSubclass, State},
-    driver::{Driver, host::pipe::In},
+    driver::Driver,
 };
-use usbd_hid::descriptor::{AsInputReport, BufferOverflow, SerializedDescriptor};
+use usbd_hid::descriptor::SerializedDescriptor;
 
 use crate::{Module, ModuleBuilder, StaticStorage};
 
@@ -44,19 +44,12 @@ pub struct UsbHidProvider<'d, D: Driver<'d>, const READ_N: usize, const WRITE_N:
     comm: &'static UsbHidSink,
 }
 
+#[derive(Default)]
 pub struct UsbHidSink {
     tx: Signal<CriticalSectionRawMutex, (InputBuffer, usize)>,
     rx: Signal<CriticalSectionRawMutex, OutputBuffer>,
 }
 
-impl Default for UsbHidSink {
-    fn default() -> Self {
-        Self {
-            tx: Default::default(),
-            rx: Default::default(),
-        }
-    }
-}
 
 impl UsbHidSink {
     /// Sends value to the host
@@ -72,7 +65,7 @@ impl UsbHidSink {
             );
         } else {
             let end = bytes.len()+1;
-            (&mut buf[1..end]).copy_from_slice(bytes);
+            buf[1..end].copy_from_slice(bytes);
             self.tx.signal((buf, end));
         }
     }
@@ -152,7 +145,7 @@ impl<'b, 'd, D: Driver<'d>> UsbHidProviderBuilder<'b, 'd, D> {
         if end > REPORT_DESCRIPTOR_SIZE {
             panic!("report descriptor buffer is too small");
         }
-        (&mut self.report_descriptor[self.descriptor_pointer..end]).copy_from_slice(descriptor);
+        self.report_descriptor[self.descriptor_pointer..end].copy_from_slice(descriptor);
         self.descriptor_pointer = end;
         self
     }

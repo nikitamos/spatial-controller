@@ -10,12 +10,12 @@ pub trait MagnetometerInterface {
 }
 
 pub struct Magnetometer<I: MagnetometerInterface> {
-    interface: I,
+    _interface: I,
 }
 
 impl<I: MagnetometerInterface> Magnetometer<I> {
-    pub fn new(interface: I) -> Self {
-        Magnetometer { interface }
+    pub fn new(_interface: I) -> Self {
+        Magnetometer { _interface }
     }
 
     pub async fn measure(&self) -> (f32, f32, f32) {

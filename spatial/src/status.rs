@@ -14,7 +14,7 @@ use crate::{
     Module, ModuleBuilder, StaticStorage,
     usb::{HidReportWithId, UsbHidSink},
 };
-use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
+use usbd_hid::descriptor::SerializedDescriptor;
 
 pub struct StatusModule<'d, D: Driver<'d>> {
     serial: cdc_acm::CdcAcmClass<'d, D>,

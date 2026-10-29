@@ -2,7 +2,7 @@ use usbd_hid::descriptor::gen_hid_descriptor;
 use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
 
 #[gen_hid_descriptor(
-    (collection = APPLICATION, usage_page = GENERIC_DESKTOP, usage = MULTI_AXIS_CONTROLLER) = {
+    (collection = APPLICATION, usage_page = GENERIC_DESKTOP, usage = MULTI_AXIS_CONTROLLER, report_id=1) = {
         // (collection = PHYSICAL, usage = POINTER) = {
         (usage_page = GENERIC_DESKTOP,) = {
             (usage = 0x33,) = {

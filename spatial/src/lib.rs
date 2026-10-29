@@ -66,7 +66,8 @@ macro_rules! impl_module_collection_for_tuple {
             async fn run(self, spawner: &Spawner) {
                 // TODO: join
                 let ($($name,)+) = self;
-                $($name.run_on(spawner);)*
+                let arr: [core::pin::Pin<&mut dyn Future<Output=()>>; _] = [$(core::pin::pin!($name.run_on(spawner)),)*];
+                embassy_futures::join::join_array(arr).await;
             }
         }
     };

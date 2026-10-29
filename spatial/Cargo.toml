@@ -33,7 +33,12 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 # heapless = { version = "0.7.5", default-features = false }
 defmt = "1.1.1"
 defmt-rtt = "1.3.0"
-embassy-usb = { version = "0.6.0", features = ["default", "defmt"] }
+embassy-usb = { version = "0.6.0", features = [
+    "default",
+    "defmt",
+    "max-interface-count-8",
+    "max-handler-count-8",
+] }
 embassy-futures = "0.1.2"
 usbd-hid = "0.10.2"
 tle493d = { version = "0.1.0", path = "../tle493d" }

@@ -17,6 +17,7 @@ use panic_probe as _;
 use spatial::orientation::{
     OrientationModule, OrientationModuleConfig,
 };
+use spatial::status::{StatusModule, StatusModuleBuilder};
 use spatial::usb::UsbBuffers;
 use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
 
@@ -109,7 +110,6 @@ async fn main(spawner: Spawner) {
         )
     };
 
-    static mut BUFFERS: UsbBuffers = UsbBuffers::ZEROED;
     // let driver = *DRIVER.get().await;
     let config = make_usb_config();
 
@@ -146,7 +146,10 @@ async fn main(spawner: Spawner) {
 }
 
 fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
-    init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),)
+    init_module!(
+        OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),
+        StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder),
+    )
 }
 
 fn make_usb_config() -> embassy_usb::Config<'static> {
@@ -154,11 +157,11 @@ fn make_usb_config() -> embassy_usb::Config<'static> {
     config.manufacturer = Some("Nikand");
     config.product = Some("Spatial Controller");
     config.serial_number = Some("0");
-    config.composite_with_iads = false;
+    config.composite_with_iads = true;
     // TODO: change to true when more classes are added
-    config.device_class = 0x03;
-    config.device_sub_class = 0;
-    config.device_protocol = 0;
+    config.device_class = 0xEF;
+    config.device_sub_class = 0x02;
+    config.device_protocol = 0x01;
     config
 }
 

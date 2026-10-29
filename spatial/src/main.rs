@@ -101,7 +101,6 @@ async fn main(spawner: Spawner) {
         static mut EP_OUT: [u8; 256] = [0; 256];
         let mut config = embassy_stm32::usb::Config::default();
         config.vbus_detection = false;
-        let mut storage = HidInterfaceStorage::default();
         Driver::new_fs(
             // this operation can not fail
             p.USB_OTG_FS,
@@ -151,10 +150,7 @@ async fn main(spawner: Spawner) {
 }
 
 fn create_modules<'a>(usb_builder: &'a mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
-    let modules = { 
-        init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),)
-    };
-    modules
+    init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),)
 }
 
 fn make_usb_config() -> embassy_usb::Config<'static> {

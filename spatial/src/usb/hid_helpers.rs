@@ -2,26 +2,36 @@ use core::{marker::PhantomData, sync::atomic::AtomicU8, sync::atomic::Ordering};
 
 use defmt::{Debug2Format, info};
 use embassy_futures::select::select;
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
+use embassy_sync::{
+    blocking_mutex::raw::CriticalSectionRawMutex, once_lock::OnceLock, signal::Signal,
+};
 use embassy_time::Timer;
 use embassy_usb::{
-    Builder, class::hid::{
-        Config, HidBootProtocol, HidProtocolMode, HidReader, HidReaderWriter, HidSubclass, ReportId, RequestHandler, State,
-    }, control::OutResponse, driver::Driver,
+    Builder,
+    class::hid::{
+        Config, HidBootProtocol, HidProtocolMode, HidReader, HidReaderWriter, HidSubclass,
+        ReportId, RequestHandler, State,
+    },
+    control::OutResponse,
+    driver::Driver,
 };
 use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
 
 #[derive(Default)]
-pub struct HidInterfaceStorage<'s> {
+pub struct HidInterfaceStorage<'s, T> {
     // handler: GenericHidRequestHandler,
     state: embassy_usb::class::hid::State<'s>,
-    // comm: UsbHidComm<T>,
+    comm: UsbHidComm<T>,
 }
 
-impl<'s> HidInterfaceStorage<'s> {
+impl<'s, T> HidInterfaceStorage<'s, T> {
     pub const fn new() -> Self {
         Self {
-            state: State::new()
+            state: State::new(),
+            comm: UsbHidComm {
+                tx: Signal::new(),
+                rx: Signal::new(),
+            },
         }
     }
 }
@@ -29,13 +39,13 @@ impl<'s> HidInterfaceStorage<'s> {
 pub struct UsbHidInterface<
     'd,
     D: Driver<'d>,
-    T: SerializedDescriptor,
+    T: SerializedDescriptor + 'static,
     const READ_N: usize,
     const WRITE_N: usize,
 > {
     _p: PhantomData<T>,
     rw: HidReaderWriter<'d, D, READ_N, WRITE_N>,
-    // comm: &'d UsbHidComm<T>,
+    comm: &'static UsbHidComm<T>,
 }
 
 pub struct UsbHidComm<T> {
@@ -79,8 +89,8 @@ where
 {
     pub fn new<'b>(
         builder: &'b mut Builder<'d, D>,
-        storage: &'d mut HidInterfaceStorage<'d>,
-    ) -> (Self, UsbHidComm<T>) {
+        storage: &'static mut HidInterfaceStorage<'d, T>,
+    ) -> Self {
         let rw: HidReaderWriter<'_, D, READ_N, WRITE_N> = HidReaderWriter::new(
             builder,
             &mut storage.state,
@@ -94,13 +104,11 @@ where
             },
         );
 
-        (
-            Self {
-                _p: PhantomData,
-                rw,
-            },
-            UsbHidComm::default(),
-        )
+        Self {
+            _p: PhantomData,
+            rw,
+            comm: &storage.comm,
+        }
     }
     fn sleep_ms(&self) -> u64 {
         100
@@ -109,7 +117,8 @@ where
         100
     }
     #[inline(always)]
-    pub async fn serve(&mut self, comm: &UsbHidComm<T>) -> ! {
+    pub async fn serve(&mut self) -> ! {
+        let comm = self.comm();
         loop {
             Timer::after_millis(self.sleep_ms()).await;
             let value = comm.recv_from_device().await;
@@ -117,8 +126,10 @@ where
                 defmt::error!("Failed to send report: {}", e);
             }
         }
+    } 
+    pub fn comm(&self) -> &'static UsbHidComm<T> {
+        self.comm
     }
-    // pub fn
 }
 
 // The following code is derived from the tutorial.

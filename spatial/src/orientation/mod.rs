@@ -22,7 +22,6 @@ pub struct OrientationModule<'d, D: Driver<'d>> {
         { core::mem::size_of::<RotationReport>() },
         { core::mem::size_of::<RotationReport>() },
     >,
-    comm: UsbHidComm<RotationReport>,
 }
 
 #[embassy_executor::task]
@@ -56,10 +55,10 @@ where
         storage: &'static mut <OrientationModule<'d, D> as Module>::Storage,
     ) -> OrientationModule<'d, D> {
         let OrientationModuleConfig { builder } = self;
-        let (iface, comm) = UsbHidInterface::new(builder, &mut storage.hid);
+        let (hid, comm_lock) = storage.split();
+        let iface = UsbHidInterface::new(builder, hid);
         OrientationModule {
             interface: iface,
-            comm,
         }
     }
 }
@@ -73,10 +72,20 @@ impl<'b, 'd, D: Driver<'d>> OrientationModuleConfig<'b, 'd, D> {
 }
 
 pub struct OrientationModuleStaticStorage<'d> {
-    hid: HidInterfaceStorage<'d>,
+    hid: HidInterfaceStorage<'d, RotationReport>,
     comm: OnceLock<UsbHidComm<RotationReport>>,
 }
 
+impl<'d> OrientationModuleStaticStorage<'d> {
+    pub fn split(
+        &'static mut self,
+    ) -> (
+        &'static mut HidInterfaceStorage<'d, RotationReport>,
+        &'static OnceLock<UsbHidComm<RotationReport>>,
+    ) {
+        (&mut self.hid, &self.comm)
+    }
+}
 impl<'d> StaticStorage for OrientationModuleStaticStorage<'d> {
     const DEFAULT: Self = Self {
         hid: HidInterfaceStorage::new(),
@@ -84,19 +93,12 @@ impl<'d> StaticStorage for OrientationModuleStaticStorage<'d> {
     };
 }
 
-static COMM: OnceLock<UsbHidComm<RotationReport>> = OnceLock::new();
-
 impl<'d, D> Module for OrientationModule<'d, D>
 where
     D: Driver<'d> + 'd,
 {
-    // type ModuleConfig = &'d mut OrientationModuleConfig<'d, 'd, D>;
-
     async fn run_on(mut self, spawner: &embassy_executor::Spawner) {
-        if let Err(_) = COMM.init(self.comm) {
-            panic!("attempt to initialize OnceLock twice");
-        }
-        let comm = COMM.get().await;
+        let comm = self.interface.comm();
         match fetch_readings(comm) {
             Ok(token) => spawner.spawn(token),
             Err(e) => match e {
@@ -105,7 +107,7 @@ where
                 }
             },
         }
-        self.interface.serve(comm).await;
+        self.interface.serve().await;
     }
 
     type Storage = OrientationModuleStaticStorage<'d>;

@@ -6,11 +6,16 @@ pub mod encoder;
 pub mod magnetometer;
 pub mod orientation;
 pub mod usb;
+pub mod status;
 
 pub trait ErrorSink {}
 
 pub trait StaticStorage {
     const DEFAULT: Self;
+}
+
+impl StaticStorage for () {
+    const DEFAULT: Self = ();
 }
 
 pub trait ModuleBuilder {

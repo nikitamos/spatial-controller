@@ -2,7 +2,6 @@
 //! This module is responsible for collecting logs
 //! and error messages as well as reporting them to the host
 
-use core::marker::PhantomData;
 
 use embassy_usb::{
     Builder,
@@ -13,7 +12,7 @@ use usbd_hid::descriptor::gen_hid_descriptor;
 
 use crate::{
     Module, ModuleBuilder, StaticStorage,
-    usb::hid_helpers::{HidInterfaceStorage, UsbHidComm, UsbHidInterface},
+    usb::hid_helpers::{HidInterfaceStorage, UsbHidInterface},
 };
 use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};
 
@@ -43,7 +42,7 @@ impl<'d> StaticStorage for StatusModuleStorage<'d> {
 impl<'d, D: Driver<'d>> Module for StatusModule<'d, D> {
     type Storage = StatusModuleStorage<'d>;
 
-    async fn run_on(mut self, spawner: &embassy_executor::Spawner) {
+    async fn run_on(mut self, _spawner: &embassy_executor::Spawner) {
         defmt::info!("status starting");
         self.hid_endpoint.serve().await;
     }

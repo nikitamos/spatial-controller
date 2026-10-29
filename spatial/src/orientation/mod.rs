@@ -1,7 +1,4 @@
-use core::{iter::Once, marker::PhantomData};
 
-use cortex_m::peripheral;
-use embassy_stm32::peripherals;
 use embassy_sync::once_lock::OnceLock;
 use embassy_time::Timer;
 use embassy_usb::{Builder, driver::Driver};
@@ -55,7 +52,7 @@ where
         storage: &'static mut <OrientationModule<'d, D> as Module>::Storage,
     ) -> OrientationModule<'d, D> {
         let OrientationModuleConfig { builder } = self;
-        let (hid, comm_lock) = storage.split();
+        let (hid, _comm_lock) = storage.split();
         let iface = UsbHidInterface::new(builder, hid);
         OrientationModule {
             interface: iface,

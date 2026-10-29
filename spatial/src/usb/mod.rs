@@ -7,19 +7,18 @@ use defmt::{Debug2Format, error, info, warn};
 use embassy_stm32::{
     Peri,
     interrupt::typelevel::Binding,
-    peripherals,
     usb::{self, DmPin, DpPin, Driver, Instance},
 };
 use embassy_time::Timer;
 use embassy_usb::{
-    Builder, UsbDevice,
+    UsbDevice,
     class::hid::{
-        HidBootProtocol, HidProtocolMode, HidReaderWriter, HidSubclass, HidWriter, ReportId,
+        HidBootProtocol, HidProtocolMode, HidSubclass, HidWriter, ReportId,
         RequestHandler,
     },
     control::OutResponse,
 };
-use usbd_hid::descriptor::{AsInputReport, MouseReport, SerializedDescriptor, gen_hid_descriptor};
+use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor, gen_hid_descriptor};
 
 static HID_PROTOCOL_MODE: AtomicU8 = AtomicU8::new(HidProtocolMode::Boot as u8);
 pub mod hid_helpers;

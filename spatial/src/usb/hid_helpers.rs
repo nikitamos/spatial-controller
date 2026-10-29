@@ -1,18 +1,14 @@
-use core::{marker::PhantomData, sync::atomic::AtomicU8, sync::atomic::Ordering};
+use core::marker::PhantomData;
 
-use defmt::{Debug2Format, info};
-use embassy_futures::select::select;
 use embassy_sync::{
-    blocking_mutex::raw::CriticalSectionRawMutex, once_lock::OnceLock, signal::Signal,
+    blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal,
 };
 use embassy_time::Timer;
 use embassy_usb::{
     Builder,
     class::hid::{
-        Config, HidBootProtocol, HidProtocolMode, HidReader, HidReaderWriter, HidSubclass,
-        ReportId, RequestHandler, State,
+        Config, HidBootProtocol, HidReaderWriter, HidSubclass, State,
     },
-    control::OutResponse,
     driver::Driver,
 };
 use usbd_hid::descriptor::{AsInputReport, SerializedDescriptor};

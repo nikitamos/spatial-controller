@@ -1,9 +1,8 @@
 #![no_std]
 
-use core::error::Error;
 
 use embedded_hal_async::{
-    delay::{self, DelayNs}, i2c::{self, SevenBitAddress, ErrorType as AsyncI2cError},
+    delay::DelayNs, i2c::{self},
 };
 use embedded_interfaces::{
     TransportError,

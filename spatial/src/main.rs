@@ -10,19 +10,15 @@ use embassy_stm32::time::Hertz;
 use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
 use embassy_sync::once_lock::OnceLock;
 use embassy_usb::Builder;
-use embassy_usb::descriptor::descriptor_type::BOS;
 use panic_probe as _;
 
 // use embedded_hal::Pwm;
 
 use spatial::orientation::{
-    OrientationModule, OrientationModuleConfig, OrientationModuleStaticStorage,
+    OrientationModule, OrientationModuleConfig,
 };
 use spatial::usb::UsbBuffers;
-use spatial::usb::hid_helpers::HidInterfaceStorage;
-use spatial::{Module, ModuleBuilder, ModuleCollection, StaticStorage, init_module};
-use tle493d::TLE493DW2B6;
-use tle493d::registers::DeviceId;
+use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
@@ -67,7 +63,7 @@ async fn main(spawner: Spawner) {
     // i2c_cfg.gpio_speed = embassy_stm32::gpio::Speed::Medium;
     i2c_cfg.scl_pullup = true;
     i2c_cfg.sda_pullup = true;
-    let mut i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
+    let _i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
     info!("i2c created");
 
     // let mut mag = TLE493DW2B6::new(
@@ -149,7 +145,7 @@ async fn main(spawner: Spawner) {
     // x.run
 }
 
-fn create_modules<'a>(usb_builder: &'a mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
+fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
     init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),)
 }
 

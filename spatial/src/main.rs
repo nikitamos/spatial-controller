@@ -18,7 +18,6 @@ use spatial::orientation::{
     OrientationModule, OrientationModuleConfig,
 };
 use spatial::status::{StatusModule, StatusModuleBuilder};
-use spatial::usb::UsbBuffers;
 use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
 
 bind_interrupts!(struct Irqs {

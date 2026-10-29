@@ -1,3 +1,4 @@
+#![deprecated(note="Use usb::UsbHidProvider instead")]
 use core::marker::PhantomData;
 
 use embassy_sync::{

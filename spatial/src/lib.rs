@@ -5,8 +5,8 @@ use embassy_executor::Spawner;
 pub mod encoder;
 pub mod magnetometer;
 pub mod orientation;
-pub mod usb;
 pub mod status;
+pub mod usb;
 
 pub trait ErrorSink {}
 
@@ -20,10 +20,7 @@ impl StaticStorage for () {
 
 pub trait ModuleBuilder {
     type Target: Module;
-    fn build(
-        self,
-        storage: &'static mut <Self::Target as Module>::Storage,
-    ) -> Self::Target;
+    fn build(self, storage: &'static mut <Self::Target as Module>::Storage) -> Self::Target;
 }
 
 /// Represents a vertical slice which is responsible for

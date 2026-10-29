@@ -43,6 +43,7 @@ embassy-futures = "0.1.2"
 usbd-hid = "0.10.2"
 tle493d = { version = "0.1.0", path = "../tle493d" }
 embassy-sync = "0.8.0"
+zerocopy = { version = "0.8.63", features = ["derive"] }
 # nb = "1.0.0"
 
 

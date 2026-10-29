@@ -14,10 +14,10 @@ use panic_probe as _;
 
 // use embedded_hal::Pwm;
 
-use spatial::orientation::{
-    OrientationModule, OrientationModuleConfig,
-};
-use spatial::status::{StatusModule, StatusModuleBuilder};
+use spatial::orientation::descriptor::RotationReport;
+use spatial::orientation::{OrientationModule, OrientationModuleConfig};
+use spatial::status::{ErrorFeature, StatusModule, StatusModuleBuilder};
+use spatial::usb::{UsbHidProvider, UsbHidProviderBuilder};
 use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
 
 bind_interrupts!(struct Irqs {
@@ -145,9 +145,19 @@ async fn main(spawner: Spawner) {
 }
 
 fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
+    let hid_module = init_module!(
+        UsbHidProvider<'static, Driver, {spatial::usb::INPUT_BUFFER_SIZE}, {spatial::usb::OUTPUT_BUFFER_SIZE}> :
+        UsbHidProviderBuilder::new(usb_builder)
+            .add_report_descriptor(&RotationReport::DESC)
+            .add_report_descriptor(&ErrorFeature::DESC)
+    );
+    
+    let sink = hid_module.comm();
+
     init_module!(
-        OrientationModule<'static, Driver> : OrientationModuleConfig::new(usb_builder),
-        StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder),
+        hid_module,;
+        OrientationModule : OrientationModuleConfig::new(sink),
+        StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder, sink),
     )
 }
 

@@ -1,7 +1,4 @@
-pub mod hid_helpers;
-use core::{marker::PhantomData, ops::Add};
-
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, rwlock::RwLock, signal::Signal};
+use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
 use embassy_time::Timer;
 use embassy_usb::{
     Builder,
@@ -18,9 +15,9 @@ pub trait HidReportWithId: SerializedDescriptor {
 
 /// Determines the size of the buffer used by IN endpoints
 /// This corresponds to the maximal descriptor length
-const INPUT_BUFFER_SIZE: usize = 32;
-const OUTPUT_BUFFER_SIZE: usize = 32;
-const REPORT_DESCRIPTOR_SIZE: usize = 256;
+pub const INPUT_BUFFER_SIZE: usize = 32;
+pub const OUTPUT_BUFFER_SIZE: usize = 32;
+pub const REPORT_DESCRIPTOR_SIZE: usize = 256;
 type InputBuffer = [u8; INPUT_BUFFER_SIZE];
 type OutputBuffer = [u8; OUTPUT_BUFFER_SIZE];
 
@@ -69,13 +66,14 @@ impl UsbHidSink {
         let bytes = val.as_bytes();
         if bytes.len() >= INPUT_BUFFER_SIZE - 1 {
             defmt::error!(
-                "failed to serialize report descriptor {}: buffer overflow (allocated {}b)",
+                "failed to serialize report {}: buffer overflow (allocated {}b)",
                 core::any::type_name::<T>(),
                 INPUT_BUFFER_SIZE
             );
         } else {
-            (&mut buf[1..bytes.len()]).copy_from_slice(bytes);
-            self.tx.signal((buf, bytes.len() + 1));
+            let end = bytes.len()+1;
+            (&mut buf[1..end]).copy_from_slice(bytes);
+            self.tx.signal((buf, end));
         }
     }
 
@@ -125,7 +123,7 @@ impl<'b, 'd, D: Driver<'d>> ModuleBuilder for UsbHidProviderBuilder<'b, 'd, D> {
             self.builder,
             &mut storage.state,
             Config {
-                report_descriptor: &storage.report_descriptor, // TODO
+                report_descriptor: &storage.report_descriptor[..self.descriptor_pointer], // TODO
                 request_handler: None,
                 poll_ms: 100,
                 max_packet_size: INPUT_BUFFER_SIZE.max(OUTPUT_BUFFER_SIZE) as u16,

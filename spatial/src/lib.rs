@@ -46,8 +46,8 @@ macro_rules! init_module {
             <<$mod as Module>::Storage as $crate::StaticStorage>::DEFAULT;
         $config.build(unsafe {(&raw mut STORAGE).as_mut_unchecked()})
     }};
-    ($($mod:ty : $config:expr,)*) => {{
-        ($(init_module!($mod : $config), )*)
+    ($($initialized:ident,)* ; $($mod:ty : $config:expr,)*) => {{
+        ($($initialized,)+ $(init_module!($mod : $config), )*)
     }}
 }
 

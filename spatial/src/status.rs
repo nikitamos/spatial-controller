@@ -12,7 +12,7 @@ use usbd_hid::descriptor::gen_hid_descriptor;
 
 use crate::{
     Module, ModuleBuilder, StaticStorage,
-    usb::{HidReportWithId, UsbHidSink},
+    usb::{UsbHidSink},
 };
 use usbd_hid::descriptor::SerializedDescriptor;
 
@@ -42,29 +42,11 @@ impl<'d, D: Driver<'d>> Module for StatusModule<'d, D> {
     }
 }
 
-#[gen_hid_descriptor(
-        (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01, report_id=2) = {
-        (usage_min = X, usage_max = Y) = {
-            #[item_settings(data,variable,relative)] x=input;
-            #[item_settings(data,variable,relative)] y=input;
-        };
-    }
-)]
-#[derive(zerocopy::Immutable, zerocopy::KnownLayout, zerocopy::IntoBytes)]
-pub struct ErrorFeature {
-    x: u8,
-    y: u16,
-}
-
-impl HidReportWithId for ErrorFeature {
-    const REPORT_ID: u8 = 2;
-}
-
 #[embassy_executor::task]
 async fn periodic() {
     loop {
-        Timer::after_millis(300).await;
-        defmt::info!("periodic task");
+        Timer::after_millis(500).await;
+        // defmt::info!("periodic task");
     }
 }
 

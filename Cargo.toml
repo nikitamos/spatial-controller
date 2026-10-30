@@ -1,3 +1,7 @@
 [workspace]
 resolver="3"
-members=["spatial", "tle493d"]
+members=["docking","spatial", "tle493d"]
+
+[workspace.dependencies]
+zerocopy = { version = "0.8.63", default-features=false, features = ["derive"] }
+usbd-hid = "0.10.2"

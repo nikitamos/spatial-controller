@@ -1,3 +1,4 @@
+use docking::reports::{HidReport, HidReportPacket};
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
 use embassy_time::Timer;
 use embassy_usb::{
@@ -6,12 +7,9 @@ use embassy_usb::{
     driver::Driver,
 };
 use usbd_hid::descriptor::SerializedDescriptor;
+use zerocopy::{IntoBytes, KnownLayout};
 
 use crate::{Module, ModuleBuilder, StaticStorage};
-
-pub trait HidReportWithId: SerializedDescriptor {
-    const REPORT_ID: u8;
-}
 
 /// Determines the size of the buffer used by IN endpoints
 /// This corresponds to the maximal descriptor length
@@ -50,13 +48,12 @@ pub struct UsbHidSink {
     rx: Signal<CriticalSectionRawMutex, OutputBuffer>,
 }
 
-
 impl UsbHidSink {
     /// Sends value to the host
-    pub fn send<T: HidReportWithId + zerocopy::IntoBytes + zerocopy::Immutable>(&self, val: T) {
+    pub fn send<T: HidReport>(&self, val: T) {
         let mut buf = InputBuffer::default();
-        buf[0] = T::REPORT_ID;
-        let bytes = val.as_bytes();
+        let packet = HidReportPacket::from(val);
+        let bytes = packet.as_bytes();
         if bytes.len() >= INPUT_BUFFER_SIZE - 1 {
             defmt::error!(
                 "failed to serialize report {}: buffer overflow (allocated {}b)",
@@ -64,8 +61,8 @@ impl UsbHidSink {
                 INPUT_BUFFER_SIZE
             );
         } else {
-            let end = bytes.len()+1;
-            buf[1..end].copy_from_slice(bytes);
+            let end = bytes.len();
+            buf[..end].copy_from_slice(bytes);
             self.tx.signal((buf, end));
         }
     }

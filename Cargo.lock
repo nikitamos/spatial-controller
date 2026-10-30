@@ -335,6 +335,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "docking"
+version = "0.1.0"
+dependencies = [
+ "usbd-hid",
+ "zerocopy",
+]
+
+[[package]]
 name = "document-features"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1184,6 +1192,7 @@ dependencies = [
  "cortex-m-rt",
  "defmt 1.1.1",
  "defmt-rtt",
+ "docking",
  "embassy-executor",
  "embassy-futures",
  "embassy-stm32",

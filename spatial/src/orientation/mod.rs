@@ -1,10 +1,7 @@
+use docking::reports;
 use embassy_time::Timer;
 
-use crate::{
-    Module, ModuleBuilder, StaticStorage, orientation::descriptor::RotationReport, usb::UsbHidSink,
-};
-
-pub mod descriptor;
+use crate::{Module, ModuleBuilder, StaticStorage, usb::UsbHidSink};
 
 pub struct OrientationModule {
     sink: &'static UsbHidSink,
@@ -14,11 +11,17 @@ pub struct OrientationModule {
 async fn fetch_readings(sender: &'static UsbHidSink) {
     loop {
         Timer::after_secs(1).await;
-        sender.send(RotationReport {
-            rx: 1,
-            ry: 2,
-            rz: 3,
+        defmt::info!("sending report");
+        sender.send(reports::nav::Position {
+            x: 1,
+            y: -2,
+            z: 4,
         });
+        // sender.send(reports::nav::Rotation {
+        //     rx: -4,
+        //     ry: 1,
+        //     rz: 10,
+        // });
     }
 }
 

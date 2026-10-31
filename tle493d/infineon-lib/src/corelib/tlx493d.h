@@ -1,7 +1,7 @@
 #ifndef TLX493D_H
 #define TLX493D_H
 
-
+#include <stdint.h>
 #ifdef __cplusplus
 
 extern "C" {
@@ -26,7 +26,8 @@ extern "C" {
  * @retval false Error.
  * @retval true Function execution was successful.
  */
-bool tlx493d_init(TLx493D_t *sensor, TLx493D_SupportedSensorType_t sensorType);
+bool tlx493d_init(TLx493D_t *sensor, TLx493D_SupportedSensorType_t sensorType,
+                  uint8_t *regMap);
 
 /**
  * @brief The function `tlx493d_deinit` is used to deinitialize a TLx493D sensor.

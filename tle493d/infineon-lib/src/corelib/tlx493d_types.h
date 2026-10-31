@@ -137,7 +137,7 @@ typedef struct TLx493D_BoardSupportInterface_t {
 
 
 /** Following are the functions which are common to all the sensors. */
-typedef bool (*TLx493D_InitFuncPtr)(TLx493D_t *);
+typedef bool (*TLx493D_InitFuncPtr)(TLx493D_t *, uint8_t *);
 typedef bool (*TLx493D_DeinitFuncPtr)(TLx493D_t *);
 
 typedef bool (*TLx493D_ReadRegistersFuncPtr)(TLx493D_t *);
@@ -318,7 +318,7 @@ typedef struct TLx493D_CommonFunctions_t {
  */
 typedef struct TLx493D_t {
     uint8_t                         *regMap;
-    TLx493D_Register_t              *regDef;
+    const TLx493D_Register_t *regDef;
     TLx493D_CommonFunctions_t       *functions;
 
     TLx493D_CommunicationInterface_t  comInterface;

@@ -20,64 +20,64 @@
 #include "TLx493D_P3B6_enums.h"
 #include "TLx493D_P3B6.h"
 
+static const TLx493D_Register_t TLx493D_P3B6_regDef[] = {
+    {/* P3B6_BX_MSBS_e, */ TLx493D_READ_MODE_e, 0x00, 0xFF, 0, 8},
+    {/* P3B6_IIC_ADR_CP_e, */ TLx493D_READ_MODE_e, 0x01, 0xC0, 6, 2},
+    {/* P3B6_BX_LSBS_e, */ TLx493D_READ_MODE_e, 0x01, 0x3F, 0, 6},
+    {/* P3B6_BY_MSBS_e, */ TLx493D_READ_MODE_e, 0x02, 0xFF, 0, 8},
+    {/* P3B6_BY_LSBS_e, */ TLx493D_READ_MODE_e, 0x03, 0x3F, 0, 6},
+    {/* P3B6_BZ_MSBS_e, */ TLx493D_READ_MODE_e, 0x04, 0xFF, 0, 8},
+    {/* P3B6_BZ_LSBS_e, */ TLx493D_READ_MODE_e, 0x05, 0x3F, 0, 6},
+    {/* P3B6_TEMP_MSBS_e, */ TLx493D_READ_MODE_e, 0x06, 0xFF, 0, 8},
+    {/* P3B6_TEMP_LSBS_e, */ TLx493D_READ_MODE_e, 0x07, 0x3F, 0, 6},
+    {/* P3B6_CRC_e, */ TLx493D_READ_MODE_e, 0x08, 0xFF, 0, 8},
+    {/* P3B6_MEAS_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x80, 7, 1},
+    {/* P3B6_TEST_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x40, 6, 1},
+    {/* P3B6_FRAME_COUNTER_e, */ TLx493D_READ_MODE_e, 0x09, 0x30, 4, 2},
+    {/* P3B6_RST_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x08, 3, 1},
+    {/* P3B6_WU_PAR_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x04, 2, 1},
+    {/* P3B6_CRC_WR_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x02, 1, 1},
+    {/* P3B6_FUSE_PAR_FLG_e, */ TLx493D_READ_MODE_e, 0x09, 0x01, 0, 1},
+    {/* P3B6_MODE_SEL_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x80, 7, 1},
+    {/* P3B6_INT_DIS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x40, 6, 1},
+    {/* P3B6_COLLISION_DIS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x20, 5, 1},
+    {/* P3B6_WU_EN_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x10, 4, 1},
+    {/* P3B6_TRIGGER_SEL_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x0C, 2, 2},
+    {/* P3B6_PROT_SEL_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x02, 1, 1},
+    {/* P3B6_CRC_WR_EN_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0x01, 0, 1},
+    {/* P3B6_CHANNEL_SEL_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0xF0, 4, 4},
+    {/* P3B6_F_UPDATE_SEL_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0x0C, 2, 2},
+    {/* P3B6_XTR_SHORT_EN_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0x02, 1, 1},
+    {/* P3B6_SHORT_EN_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0x01, 0, 1},
+    {/* P3B6_WU_XH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0C, 0xFF, 0, 8},
+    {/* P3B6_WU_XL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0xFF, 0, 8},
+    {/* P3B6_WU_YH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0xFF, 0, 8},
+    {/* P3B6_WU_YL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0xFF, 0, 8},
+    {/* P3B6_WU_ZH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0xFF, 0, 8},
+    {/* P3B6_WU_ZL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0xFF, 0, 8},
+    {/* P3B6_WU_XH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x12, 0xC0, 6, 2},
+    {/* P3B6_WU_XL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x12, 0x30, 4, 2},
+    {/* P3B6_WU_YH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x12, 0x0C, 2, 2},
+    {/* P3B6_WU_YL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x12, 0x03, 0, 2},
+    {/* P3B6_WU_PAR_e, */ TLx493D_READ_WRITE_MODE_e, 0x13, 0x20, 5, 1},
+    {/* P3B6_WU_EN_CP_e, */ TLx493D_WRITE_MODE_e, 0x13, 0x10, 4, 1},
+    {/* P3B6_WU_ZH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x13, 0x0C, 2, 2},
+    {/* P3B6_WU_ZL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x13, 0x03, 0, 2},
+    {/* P3B6_RST_FLG_CLR_e, */ TLx493D_WRITE_MODE_e, 0x14, 0x02, 1, 1},
+    {/* P3B6_SOFT_RST_e, */ TLx493D_WRITE_MODE_e, 0x14, 0x01, 0, 1},
+    {/* P3B6_CHIP_ID_0_e, */ TLx493D_READ_MODE_e, 0x15, 0xFF, 0, 8},
+    {/* P3B6_CHIP_ID_1_e, */ TLx493D_READ_MODE_e, 0x16, 0xFF, 0, 8},
+    {/* P3B6_CHIP_ID_2_e, */ TLx493D_READ_MODE_e, 0x17, 0xFF, 0, 8},
+    {/* P3B6_CHIP_ID_3_e, */ TLx493D_READ_MODE_e, 0x18, 0xFF, 0, 8},
+    {/* P3B6_CHIP_ID_4_e, */ TLx493D_READ_MODE_e, 0x19, 0xFF, 0, 8},
+    {/* P3B6_ID_PAR_e, */ TLx493D_READ_MODE_e, 0x1A, 0x40, 6, 1},
+    {/* P3B6_CHIP_ID_5_e, */ TLx493D_READ_MODE_e, 0x1A, 0x3F, 0, 6},
 
-static TLx493D_Register_t TLx493D_P3B6_regDef[] = {
-    { /* P3B6_BX_MSBS_e, */       TLx493D_READ_MODE_e,        0x00, 0xFF, 0, 8 },
-    { /* P3B6_IIC_ADR_CP_e, */    TLx493D_READ_MODE_e,        0x01, 0xC0, 6, 2 },
-    { /* P3B6_BX_LSBS_e, */       TLx493D_READ_MODE_e,        0x01, 0x3F, 0, 6 },
-    { /* P3B6_BY_MSBS_e, */       TLx493D_READ_MODE_e,        0x02, 0xFF, 0, 8 },
-    { /* P3B6_BY_LSBS_e, */       TLx493D_READ_MODE_e,        0x03, 0x3F, 0, 6 },
-    { /* P3B6_BZ_MSBS_e, */       TLx493D_READ_MODE_e,        0x04, 0xFF, 0, 8 },
-    { /* P3B6_BZ_LSBS_e, */       TLx493D_READ_MODE_e,        0x05, 0x3F, 0, 6 },
-    { /* P3B6_TEMP_MSBS_e, */     TLx493D_READ_MODE_e,        0x06, 0xFF, 0, 8 },
-    { /* P3B6_TEMP_LSBS_e, */     TLx493D_READ_MODE_e,        0x07, 0x3F, 0, 6 },
-    { /* P3B6_CRC_e, */           TLx493D_READ_MODE_e,        0x08, 0xFF, 0, 8 },
-    { /* P3B6_MEAS_FLG_e, */      TLx493D_READ_MODE_e,        0x09, 0x80, 7, 1 },
-    { /* P3B6_TEST_FLG_e, */      TLx493D_READ_MODE_e,        0x09, 0x40, 6, 1 },
-    { /* P3B6_FRAME_COUNTER_e, */ TLx493D_READ_MODE_e,        0x09, 0x30, 4, 2 },
-    { /* P3B6_RST_FLG_e, */       TLx493D_READ_MODE_e,        0x09, 0x08, 3, 1 },
-    { /* P3B6_WU_PAR_FLG_e, */    TLx493D_READ_MODE_e,        0x09, 0x04, 2, 1 },
-    { /* P3B6_CRC_WR_FLG_e, */    TLx493D_READ_MODE_e,        0x09, 0x02, 1, 1 },
-    { /* P3B6_FUSE_PAR_FLG_e, */  TLx493D_READ_MODE_e,        0x09, 0x01, 0, 1 },
-    { /* P3B6_MODE_SEL_e, */      TLx493D_READ_WRITE_MODE_e,  0x0A, 0x80, 7, 1 },
-    { /* P3B6_INT_DIS_e, */       TLx493D_READ_WRITE_MODE_e,  0x0A, 0x40, 6, 1 },
-    { /* P3B6_COLLISION_DIS_e, */ TLx493D_READ_WRITE_MODE_e,  0x0A, 0x20, 5, 1 },
-    { /* P3B6_WU_EN_e, */         TLx493D_READ_WRITE_MODE_e,  0x0A, 0x10, 4, 1 },
-    { /* P3B6_TRIGGER_SEL_e, */   TLx493D_READ_WRITE_MODE_e,  0x0A, 0x0C, 2, 2 },
-    { /* P3B6_PROT_SEL_e, */      TLx493D_READ_WRITE_MODE_e,  0x0A, 0x02, 1, 1 },
-    { /* P3B6_CRC_WR_EN_e, */     TLx493D_READ_WRITE_MODE_e,  0x0A, 0x01, 0, 1 },
-    { /* P3B6_CHANNEL_SEL_e, */   TLx493D_READ_WRITE_MODE_e,  0x0B, 0xF0, 4, 4 },
-    { /* P3B6_F_UPDATE_SEL_e, */  TLx493D_READ_WRITE_MODE_e,  0x0B, 0x0C, 2, 2 },
-    { /* P3B6_XTR_SHORT_EN_e, */  TLx493D_READ_WRITE_MODE_e,  0x0B, 0x02, 1, 1 },
-    { /* P3B6_SHORT_EN_e, */      TLx493D_READ_WRITE_MODE_e,  0x0B, 0x01, 0, 1 },
-    { /* P3B6_WU_XH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0C, 0xFF, 0, 8 },
-    { /* P3B6_WU_XL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0D, 0xFF, 0, 8 },
-    { /* P3B6_WU_YH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0E, 0xFF, 0, 8 },
-    { /* P3B6_WU_YL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0F, 0xFF, 0, 8 },
-    { /* P3B6_WU_ZH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x10, 0xFF, 0, 8 },
-    { /* P3B6_WU_ZL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x11, 0xFF, 0, 8 },
-    { /* P3B6_WU_XH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x12, 0xC0, 6, 2 },
-    { /* P3B6_WU_XL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x12, 0x30, 4, 2 },
-    { /* P3B6_WU_YH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x12, 0x0C, 2, 2 },
-    { /* P3B6_WU_YL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x12, 0x03, 0, 2 },
-    { /* P3B6_WU_PAR_e, */        TLx493D_READ_WRITE_MODE_e,  0x13, 0x20, 5, 1 },
-    { /* P3B6_WU_EN_CP_e, */      TLx493D_WRITE_MODE_e,       0x13, 0x10, 4, 1 },
-    { /* P3B6_WU_ZH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x13, 0x0C, 2, 2 },
-    { /* P3B6_WU_ZL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x13, 0x03, 0, 2 },
-    { /* P3B6_RST_FLG_CLR_e, */   TLx493D_WRITE_MODE_e,       0x14, 0x02, 1, 1 },
-    { /* P3B6_SOFT_RST_e, */      TLx493D_WRITE_MODE_e,       0x14, 0x01, 0, 1 },
-    { /* P3B6_CHIP_ID_0_e, */     TLx493D_READ_MODE_e,        0x15, 0xFF, 0, 8 },
-    { /* P3B6_CHIP_ID_1_e, */     TLx493D_READ_MODE_e,        0x16, 0xFF, 0, 8 },
-    { /* P3B6_CHIP_ID_2_e, */     TLx493D_READ_MODE_e,        0x17, 0xFF, 0, 8 },
-    { /* P3B6_CHIP_ID_3_e, */     TLx493D_READ_MODE_e,        0x18, 0xFF, 0, 8 },
-    { /* P3B6_CHIP_ID_4_e, */     TLx493D_READ_MODE_e,        0x19, 0xFF, 0, 8 },
-    { /* P3B6_ID_PAR_e, */        TLx493D_READ_MODE_e,        0x1A, 0x40, 6, 1 },
-    { /* P3B6_CHIP_ID_5_e, */     TLx493D_READ_MODE_e,        0x1A, 0x3F, 0, 6 },
-
-    /* From here on fields to be saved for proper handling of skip@read are listed. These are not part of the registers set !*/
-    { /* P3B6_CHANNEL_SEL_SAVE_e, */ TLx493D_READ_WRITE_MODE_e,  0x1B, 0xF0, 4, 4 },
+    /* From here on fields to be saved for proper handling of skip@read are
+       listed. These are not part of the registers set !*/
+    {/* P3B6_CHANNEL_SEL_SAVE_e, */ TLx493D_READ_WRITE_MODE_e, 0x1B, 0xF0, 4,
+     4},
 };
-
 
 static TLx493D_CommonFunctions_t TLx493D_P3B6_commonFunctions = {
     .init                           = TLx493D_P3B6_init,
@@ -163,11 +163,11 @@ static TLx493D_CommonFunctions_t TLx493D_P3B6_commonFunctions = {
     .getSensitivityScaleFactor      = TLx493D_P3B6_getSensitivityScaleFactor,
 };
 
-
-bool TLx493D_P3B6_init(TLx493D_t *sensor) {
-    return tlx493d_common_init(sensor, GEN_3_REG_MAP_SIZE, TLx493D_P3B6_regDef, &TLx493D_P3B6_commonFunctions, TLx493D_P3B6_e, TLx493D_I2C_e);
+bool TLx493D_P3B6_init(TLx493D_t *sensor, uint8_t *regMap) {
+  return tlx493d_common_init(sensor, GEN_3_REG_MAP_SIZE, TLx493D_P3B6_regDef,
+                             &TLx493D_P3B6_commonFunctions, TLx493D_P3B6_e,
+                             TLx493D_I2C_e);
 }
-
 
 bool TLx493D_P3B6_deinit(TLx493D_t *sensor) {
     return tlx493d_common_deinit(sensor);

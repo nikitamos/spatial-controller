@@ -18,7 +18,7 @@ extern "C" {
 
 
 /** common functions. */
-bool TLx493D_A2BW_init(TLx493D_t *sensor);
+bool TLx493D_A2BW_init(TLx493D_t *sensor, uint8_t *regMap);
 bool TLx493D_A2BW_deinit(TLx493D_t *sensor);
 
 bool TLx493D_A2BW_readRegisters(TLx493D_t *sensor);

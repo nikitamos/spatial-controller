@@ -20,59 +20,58 @@
 #include "TLx493D_W2BW_enums.h"
 #include "TLx493D_W2BW.h"
 
+static const TLx493D_Register_t TLx493D_W2BW_regDef[] = {
+    {/* W2BW_BX_MSBS_e, */ TLx493D_READ_MODE_e, 0x00, 0xFF, 0, 8},
+    {/* W2BW_BY_MSBS_e, */ TLx493D_READ_MODE_e, 0x01, 0xFF, 0, 8},
+    {/* W2BW_BZ_MSBS_e, */ TLx493D_READ_MODE_e, 0x02, 0xFF, 0, 8},
+    {/* W2BW_TEMP_MSBS_e, */ TLx493D_READ_MODE_e, 0x03, 0xFF, 0, 8},
+    {/* W2BW_BX_LSBS_e, */ TLx493D_READ_MODE_e, 0x04, 0xF0, 4, 4},
+    {/* W2BW_BY_LSBS_e, */ TLx493D_READ_MODE_e, 0x04, 0x0F, 0, 4},
+    {/* W2BW_TEMP_LSBS_e, */ TLx493D_READ_MODE_e, 0x05, 0xC0, 6, 2},
+    {/* W2BW_ID_e, */ TLx493D_READ_MODE_e, 0x05, 0x30, 4, 2},
+    {/* W2BW_BZ_LSBS_e, */ TLx493D_READ_MODE_e, 0x05, 0x0F, 0, 4},
+    {/* W2BW_P_e, */ TLx493D_READ_MODE_e, 0x06, 0x80, 7, 1},
+    {/* W2BW_FF_e, */ TLx493D_READ_MODE_e, 0x06, 0x40, 6, 1},
+    {/* W2BW_CF_e, */ TLx493D_READ_MODE_e, 0x06, 0x20, 5, 1},
+    {/* W2BW_T_e, */ TLx493D_READ_MODE_e, 0x06, 0x10, 4, 1},
+    {/* W2BW_PD3_e, */ TLx493D_READ_MODE_e, 0x06, 0x08, 3, 1},
+    {/* W2BW_PD0_e, */ TLx493D_READ_MODE_e, 0x06, 0x04, 2, 1},
+    {/* W2BW_FRM_e, */ TLx493D_READ_MODE_e, 0x06, 0x03, 0, 2},
+    {/* W2BW_XL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x07, 0xFF, 0, 8},
+    {/* W2BW_XH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x08, 0xFF, 0, 8},
+    {/* W2BW_YL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x09, 0xFF, 0, 8},
+    {/* W2BW_YH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0xFF, 0, 8},
+    {/* W2BW_ZL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0xFF, 0, 8},
+    {/* W2BW_ZH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0C, 0xFF, 0, 8},
+    {/* W2BW_WA_e, */ TLx493D_READ_MODE_e, 0x0D, 0x80, 7, 1},
+    {/* W2BW_WU_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x40, 6, 1},
+    {/* W2BW_XH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x38, 3, 3},
+    {/* W2BW_XL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x07, 0, 3},
+    {/* W2BW_YH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0x38, 3, 3},
+    {/* W2BW_YL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0x07, 0, 3},
+    {/* W2BW_ZH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0x38, 3, 3},
+    {/* W2BW_ZL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0x07, 0, 3},
+    {/* W2BW_DT_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x80, 7, 1},
+    {/* W2BW_AM_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x40, 6, 1},
+    {/* W2BW_TRIG_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x30, 4, 2},
+    {/* W2BW_X2_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x08, 3, 1},
+    {/* W2BW_TL_MAG_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x06, 1, 2},
+    {/* W2BW_CP_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x01, 0, 1},
+    {/* W2BW_FP_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x80, 7, 1},
+    {/* W2BW_IICADR_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x60, 5, 2},
+    {/* W2BW_PR_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x10, 4, 1},
+    {/* W2BW_CA_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x08, 3, 1},
+    {/* W2BW_INT_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x04, 2, 1},
+    {/* W2BW_MODE_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x03, 0, 2},
+    {/* W2BW_PRD_e, */ TLx493D_READ_WRITE_MODE_e, 0x13, 0xE0, 5, 3},
+    {/* W2BW_X4_e, */ TLx493D_WRITE_MODE_e, 0x14, 0x01, 0, 1},
+    {/* W2BW_TYPE_e, */ TLx493D_READ_MODE_e, 0x16, 0x30, 4, 2},
+    {/* W2BW_HWV_e, */ TLx493D_READ_MODE_e, 0x16, 0x0F, 0, 4},
 
-static TLx493D_Register_t TLx493D_W2BW_regDef[] = {
-    { /* W2BW_BX_MSBS_e, */    TLx493D_READ_MODE_e,         0x00,   0xFF,   0,  8 },
-    { /* W2BW_BY_MSBS_e, */    TLx493D_READ_MODE_e,         0x01,   0xFF,   0,  8 },
-    { /* W2BW_BZ_MSBS_e, */    TLx493D_READ_MODE_e,         0x02,   0xFF,   0,  8 },
-    { /* W2BW_TEMP_MSBS_e, */  TLx493D_READ_MODE_e,         0x03,   0xFF,   0,  8 },
-    { /* W2BW_BX_LSBS_e, */    TLx493D_READ_MODE_e,         0x04,   0xF0,   4,  4 },
-    { /* W2BW_BY_LSBS_e, */    TLx493D_READ_MODE_e,         0x04,   0x0F,   0,  4 },
-    { /* W2BW_TEMP_LSBS_e, */  TLx493D_READ_MODE_e,         0x05,   0xC0,   6,  2 },
-    { /* W2BW_ID_e, */         TLx493D_READ_MODE_e,         0x05,   0x30,   4,  2 },
-    { /* W2BW_BZ_LSBS_e, */    TLx493D_READ_MODE_e,         0x05,   0x0F,   0,  4 },
-    { /* W2BW_P_e, */          TLx493D_READ_MODE_e,         0x06,   0x80,   7,  1 },
-    { /* W2BW_FF_e, */         TLx493D_READ_MODE_e,         0x06,   0x40,   6,  1 },
-    { /* W2BW_CF_e, */         TLx493D_READ_MODE_e,         0x06,   0x20,   5,  1 },
-    { /* W2BW_T_e, */          TLx493D_READ_MODE_e,         0x06,   0x10,   4,  1 },
-    { /* W2BW_PD3_e, */        TLx493D_READ_MODE_e,         0x06,   0x08,   3,  1 },
-    { /* W2BW_PD0_e, */        TLx493D_READ_MODE_e,         0x06,   0x04,   2,  1 },
-    { /* W2BW_FRM_e, */        TLx493D_READ_MODE_e,         0x06,   0x03,   0,  2 },
-    { /* W2BW_XL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x07,   0xFF,   0,  8 },
-    { /* W2BW_XH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x08,   0xFF,   0,  8 },
-    { /* W2BW_YL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x09,   0xFF,   0,  8 },
-    { /* W2BW_YH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0A,   0xFF,   0,  8 },
-    { /* W2BW_ZL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0B,   0xFF,   0,  8 },
-    { /* W2BW_ZH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0C,   0xFF,   0,  8 },
-    { /* W2BW_WA_e, */         TLx493D_READ_MODE_e,         0x0D,   0x80,   7,  1 },
-    { /* W2BW_WU_e, */         TLx493D_READ_WRITE_MODE_e,   0x0D,   0x40,   6,  1 },
-    { /* W2BW_XH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0D,   0x38,   3,  3 },
-    { /* W2BW_XL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0D,   0x07,   0,  3 },
-    { /* W2BW_YH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0E,   0x38,   3,  3 },
-    { /* W2BW_YL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0E,   0x07,   0,  3 },
-    { /* W2BW_ZH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0F,   0x38,   3,  3 },
-    { /* W2BW_ZL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,   0x0F,   0x07,   0,  3 },
-    { /* W2BW_DT_e, */         TLx493D_READ_WRITE_MODE_e,   0x10,   0x80,   7,  1 },
-    { /* W2BW_AM_e, */         TLx493D_READ_WRITE_MODE_e,   0x10,   0x40,   6,  1 },
-    { /* W2BW_TRIG_e, */       TLx493D_READ_WRITE_MODE_e,   0x10,   0x30,   4,  2 },
-    { /* W2BW_X2_e, */         TLx493D_READ_WRITE_MODE_e,   0x10,   0x08,   3,  1 },
-    { /* W2BW_TL_MAG_e, */     TLx493D_READ_WRITE_MODE_e,   0x10,   0x06,   1,  2 },
-    { /* W2BW_CP_e, */         TLx493D_READ_WRITE_MODE_e,   0x10,   0x01,   0,  1 },
-    { /* W2BW_FP_e, */         TLx493D_READ_WRITE_MODE_e,   0x11,   0x80,   7,  1 },
-    { /* W2BW_IICADR_e, */     TLx493D_READ_WRITE_MODE_e,   0x11,   0x60,   5,  2 },
-    { /* W2BW_PR_e, */         TLx493D_READ_WRITE_MODE_e,   0x11,   0x10,   4,  1 },
-    { /* W2BW_CA_e, */         TLx493D_READ_WRITE_MODE_e,   0x11,   0x08,   3,  1 },
-    { /* W2BW_INT_e, */        TLx493D_READ_WRITE_MODE_e,   0x11,   0x04,   2,  1 },
-    { /* W2BW_MODE_e, */       TLx493D_READ_WRITE_MODE_e,   0x11,   0x03,   0,  2 },
-    { /* W2BW_PRD_e, */        TLx493D_READ_WRITE_MODE_e,   0x13,   0xE0,   5,  3 },
-    { /* W2BW_X4_e, */         TLx493D_WRITE_MODE_e,        0x14,   0x01,   0,  1 },
-    { /* W2BW_TYPE_e, */       TLx493D_READ_MODE_e,         0x16,   0x30,   4,  2 },
-    { /* W2BW_HWV_e, */        TLx493D_READ_MODE_e,         0x16,   0x0F,   0,  4 },
-
-    /* From here on write-only fields are listed. These are not part of the registers set !*/
-    { /* W2BW_X4_READWRITE_e, */    TLx493D_READ_WRITE_MODE_e,   0x17,   0x01,   0,  1 },
+    /* From here on write-only fields are listed. These are not part of the
+       registers set !*/
+    {/* W2BW_X4_READWRITE_e, */ TLx493D_READ_WRITE_MODE_e, 0x17, 0x01, 0, 1},
 };
-
 
 static TLx493D_CommonFunctions_t TLx493D_W2BW_commonFunctions = {
     .init                           = TLx493D_W2BW_init,
@@ -158,11 +157,11 @@ static TLx493D_CommonFunctions_t TLx493D_W2BW_commonFunctions = {
     .getSensitivityScaleFactor      = TLx493D_W2BW_getSensitivityScaleFactor,
 };
 
-
-bool TLx493D_W2BW_init(TLx493D_t *sensor) {
-    return tlx493d_common_init(sensor, GEN_2_REG_MAP_SIZE, TLx493D_W2BW_regDef, &TLx493D_W2BW_commonFunctions, TLx493D_W2BW_e, TLx493D_I2C_e);
+bool TLx493D_W2BW_init(TLx493D_t *sensor, uint8_t *regMap) {
+  return tlx493d_common_init(sensor, GEN_2_REG_MAP_SIZE, TLx493D_W2BW_regDef,
+                             &TLx493D_W2BW_commonFunctions, TLx493D_W2BW_e,
+                             TLx493D_I2C_e);
 }
-
 
 bool TLx493D_W2BW_deinit(TLx493D_t *sensor) {
     return tlx493d_common_deinit(sensor);

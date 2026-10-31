@@ -3,9 +3,8 @@
 
 
 /** project cpp includes. */
-#include "baseTypes.hpp"
 #include "TLx493D.hpp"
-
+#include "rustTypes.h"
 
 namespace ifx {
     namespace tlx493d {

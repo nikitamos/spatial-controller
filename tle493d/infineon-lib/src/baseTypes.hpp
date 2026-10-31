@@ -7,35 +7,34 @@
 #include "SPIClassWrapper.hpp"
 #include "TwoWireWrapper.hpp"
 
-
+#ifdef __cplusplus
 extern "C" {
+#endif
+//
 
-    /**
-     * @brief Structure to hold the I2C-object, needed for communication.
-     */
-    using TLx493D_I2CObject_t = struct TLx493D_I2CObject {
-        ifx::tlx493d::TwoWireWrapper *wire;
-        bool                          isToBeDeleted;
-    };
+struct RustI2cComm;
+struct RustSpiComm;
 
+/**
+ * @brief Structure to hold the I2C-object, needed for communication.
+ */
+using TLx493D_I2CObject_t = RustI2cComm;
 
-    /**
-     * @brief Structure to hold the SPI-object, needed for communication.
-     */
-    using TLx493D_SPIObject_t = struct TLx493D_SPIObject {
-        ifx::tlx493d::SPIClassWrapper *spi;
-        bool                           isToBeDeleted;
-    };
+/**
+ * @brief Structure to hold the SPI-object, needed for communication.
+ */
+using TLx493D_SPIObject_t = void;
 
+/**
+ * @brief Structure to hold the Kit2GoBoardSupport-Object.
+ */
+using TLx493D_Kit2GoBoardSupportObject_t =
+    struct TLx493D_Kit2GoBoardSupportObject {
+  char x;
+};
 
-    /**
-     * @brief Structure to hold the Kit2GoBoardSupport-Object.
-    */
-    using TLx493D_Kit2GoBoardSupportObject_t = struct TLx493D_Kit2GoBoardSupportObject {
-        ifx::tlx493d::Kit2GoBoardSupport  *k2go;
-    };
-
-}
-
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // TLX493D_ARDUINO_BASETYPES_H

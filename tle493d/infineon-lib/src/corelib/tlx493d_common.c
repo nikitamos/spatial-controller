@@ -17,34 +17,35 @@
 
 /***
 */
-bool tlx493d_common_init(TLx493D_t *sensor, uint8_t regMapSize, TLx493D_Register_t *regDef, TLx493D_CommonFunctions_t *commonFuncs,
-                         TLx493D_SupportedSensorType_t sensorType, TLx493D_SupportedComLibraryInterfaceType_t comIFType) {
-    sensor->regMap     = (uint8_t*) malloc(sizeof(uint8_t) * regMapSize);
+bool tlx493d_common_init(TLx493D_t *sensor, uint8_t regMapSize,
+                         const TLx493D_Register_t *regDef,
+                         TLx493D_CommonFunctions_t *commonFuncs,
+                         TLx493D_SupportedSensorType_t sensorType,
+                         TLx493D_SupportedComLibraryInterfaceType_t comIFType) {
+  sensor->regMap = (uint8_t *)malloc(sizeof(uint8_t) * regMapSize);
 
-    if( sensor->regMap == NULL ) {
-        logError("Malloc regMap failed !");
-        logFlush();
-        return false;
-    }
-    else {
-        sensor->regDef     = regDef;
-        sensor->functions  = commonFuncs;
-        sensor->regMapSize = regMapSize;
-        sensor->sensorType = sensorType;
-        sensor->comIFType  = comIFType;
+  if (sensor->regMap == NULL) {
+    logError("Malloc regMap failed !");
+    logFlush();
+    return false;
+  } else {
+    sensor->regDef = regDef;
+    sensor->functions = commonFuncs;
+    sensor->regMapSize = regMapSize;
+    sensor->sensorType = sensorType;
+    sensor->comIFType = comIFType;
 
-        sensor->comInterface.comLibFuncs                       = NULL;
-        sensor->comInterface.comLibObj.iic_obj                 = NULL;
+    sensor->comInterface.comLibFuncs = NULL;
+    sensor->comInterface.comLibObj.iic_obj = NULL;
 
-        sensor->boardSupportInterface.boardSupportObj.k2go_obj = NULL;
+    sensor->boardSupportInterface.boardSupportObj.k2go_obj = NULL;
 
-        (void) memset(sensor->regMap, 0, sensor->regMapSize);
-        sensor->functions->setResetValues(sensor);
-    }
+    (void)memset(sensor->regMap, 0, sensor->regMapSize);
+    sensor->functions->setResetValues(sensor);
+  }
 
-    return true;
+  return true;
 }
-
 
 /***
  * 

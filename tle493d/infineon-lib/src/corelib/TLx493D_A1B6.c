@@ -54,38 +54,37 @@ typedef enum {
     TLx493D_A1B6_PARITY_TEST_ENABLE_default
 } TLx493D_A1B6_Reg_PARITY_TEST_NEN;
 
-
-static TLx493D_Register_t TLx493D_A1B6_regDef[] = {
+static const TLx493D_Register_t TLx493D_A1B6_regDef[] = {
     /** Read registers. */
-    { /* A1B6_BX_MSB_e, */        TLx493D_READ_MODE_e,     0x00, 0xFF, 0, 8 },
-    { /* A1B6_BY_MSB_e, */        TLx493D_READ_MODE_e,     0x01, 0xFF, 0, 8 },
-    { /* A1B6_BZ_MSB_e, */        TLx493D_READ_MODE_e,     0x02, 0xFF, 0, 8 },
-    { /* A1B6_TEMP_MSB_e, */      TLx493D_READ_MODE_e,     0x03, 0xF0, 4, 4 },
-    { /* A1B6_FRM_e, */           TLx493D_READ_MODE_e,     0x03, 0x0C, 2, 2 },
-    { /* A1B6_CH_e, */            TLx493D_READ_MODE_e,     0x03, 0x03, 0, 2 },
-    { /* A1B6_BX_LSB_e, */        TLx493D_READ_MODE_e,     0x04, 0xF0, 4, 4 },
-    { /* A1B6_BY_LSB_e, */        TLx493D_READ_MODE_e,     0x04, 0x0F, 0, 4 },
-    { /* A1B6_T_e, */             TLx493D_READ_MODE_e,     0x05, 0x40, 6, 1 },
-    { /* A1B6_FF_e, */            TLx493D_READ_MODE_e,     0x05, 0x20, 5, 1 },
-    { /* A1B6_PD_e, */            TLx493D_READ_MODE_e,     0x05, 0x10, 4, 1 },
-    { /* A1B6_BZ_LSB_e, */        TLx493D_READ_MODE_e,     0x05, 0x0F, 0, 4 },
-    { /* A1B6_TEMP_LSB_e, */      TLx493D_READ_MODE_e,     0x06, 0xFF, 0, 8 },
-    { /* A1B6_R_RES_1_e, */       TLx493D_READ_MODE_e,     0x07, 0x18, 3, 2 },
-    { /* A1B6_R_RES_2_e, */       TLx493D_READ_MODE_e,     0x08, 0xFF, 0, 8 },
-    { /* A1B6_R_RES_3_e, */       TLx493D_READ_MODE_e,     0x09, 0x1F, 0, 5 },
+    {/* A1B6_BX_MSB_e, */ TLx493D_READ_MODE_e, 0x00, 0xFF, 0, 8},
+    {/* A1B6_BY_MSB_e, */ TLx493D_READ_MODE_e, 0x01, 0xFF, 0, 8},
+    {/* A1B6_BZ_MSB_e, */ TLx493D_READ_MODE_e, 0x02, 0xFF, 0, 8},
+    {/* A1B6_TEMP_MSB_e, */ TLx493D_READ_MODE_e, 0x03, 0xF0, 4, 4},
+    {/* A1B6_FRM_e, */ TLx493D_READ_MODE_e, 0x03, 0x0C, 2, 2},
+    {/* A1B6_CH_e, */ TLx493D_READ_MODE_e, 0x03, 0x03, 0, 2},
+    {/* A1B6_BX_LSB_e, */ TLx493D_READ_MODE_e, 0x04, 0xF0, 4, 4},
+    {/* A1B6_BY_LSB_e, */ TLx493D_READ_MODE_e, 0x04, 0x0F, 0, 4},
+    {/* A1B6_T_e, */ TLx493D_READ_MODE_e, 0x05, 0x40, 6, 1},
+    {/* A1B6_FF_e, */ TLx493D_READ_MODE_e, 0x05, 0x20, 5, 1},
+    {/* A1B6_PD_e, */ TLx493D_READ_MODE_e, 0x05, 0x10, 4, 1},
+    {/* A1B6_BZ_LSB_e, */ TLx493D_READ_MODE_e, 0x05, 0x0F, 0, 4},
+    {/* A1B6_TEMP_LSB_e, */ TLx493D_READ_MODE_e, 0x06, 0xFF, 0, 8},
+    {/* A1B6_R_RES_1_e, */ TLx493D_READ_MODE_e, 0x07, 0x18, 3, 2},
+    {/* A1B6_R_RES_2_e, */ TLx493D_READ_MODE_e, 0x08, 0xFF, 0, 8},
+    {/* A1B6_R_RES_3_e, */ TLx493D_READ_MODE_e, 0x09, 0x1F, 0, 5},
     /** Write Registers. */
-    { /* A1B6_W_RES_0_e, */       TLx493D_WRITE_MODE_e,    0x00, 0xFF, 0, 8 },
-    { /* A1B6_P_e, */             TLx493D_WRITE_MODE_e,    0x01, 0x80, 7, 1 },
-    { /* A1B6_IICADR_e, */        TLx493D_WRITE_MODE_e,    0x01, 0x60, 5, 2 },
-    { /* A1B6_W_RES_1_e, */       TLx493D_WRITE_MODE_e,    0x01, 0x18, 3, 2 },
-    { /* A1B6_INT_e, */           TLx493D_WRITE_MODE_e,    0x01, 0x04, 2, 1 },
-    { /* A1B6_FAST_e, */          TLx493D_WRITE_MODE_e,    0x01, 0x02, 1, 1 },
-    { /* A1B6_LOW_POWER_e, */     TLx493D_WRITE_MODE_e,    0x01, 0x01, 0, 1 },
-    { /* A1B6_W_RES_2_e, */       TLx493D_WRITE_MODE_e,    0x02, 0xFF, 0, 8 },
-    { /* A1B6_Temp_NEN_e, */      TLx493D_WRITE_MODE_e,    0x03, 0x80, 7, 1 },
-    { /* A1B6_LP_e, */            TLx493D_WRITE_MODE_e,    0x03, 0x40, 6, 1 },
-    { /* A1B6_PT_e, */            TLx493D_WRITE_MODE_e,    0x03, 0x20, 5, 1 },
-    { /* A1B6_W_RES_3_e, */       TLx493D_WRITE_MODE_e,    0x03, 0x1F, 0, 5 },
+    {/* A1B6_W_RES_0_e, */ TLx493D_WRITE_MODE_e, 0x00, 0xFF, 0, 8},
+    {/* A1B6_P_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x80, 7, 1},
+    {/* A1B6_IICADR_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x60, 5, 2},
+    {/* A1B6_W_RES_1_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x18, 3, 2},
+    {/* A1B6_INT_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x04, 2, 1},
+    {/* A1B6_FAST_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x02, 1, 1},
+    {/* A1B6_LOW_POWER_e, */ TLx493D_WRITE_MODE_e, 0x01, 0x01, 0, 1},
+    {/* A1B6_W_RES_2_e, */ TLx493D_WRITE_MODE_e, 0x02, 0xFF, 0, 8},
+    {/* A1B6_Temp_NEN_e, */ TLx493D_WRITE_MODE_e, 0x03, 0x80, 7, 1},
+    {/* A1B6_LP_e, */ TLx493D_WRITE_MODE_e, 0x03, 0x40, 6, 1},
+    {/* A1B6_PT_e, */ TLx493D_WRITE_MODE_e, 0x03, 0x20, 5, 1},
+    {/* A1B6_W_RES_3_e, */ TLx493D_WRITE_MODE_e, 0x03, 0x1F, 0, 5},
 };
 
 static TLx493D_A1B6_PowerModeCombinations_t TLx493D_A1B6_PowerModeCombinations[] = {
@@ -183,8 +182,10 @@ static TLx493D_CommonFunctions_t TLx493D_A1B6_commonFunctions = {
 
 
 /** note: make sure that the init function is called at reset to make sure the write default values are in sync. */
-bool TLx493D_A1B6_init(TLx493D_t *sensor) {
-    return tlx493d_common_init(sensor, GEN_1_REG_MAP_SIZE, TLx493D_A1B6_regDef, &TLx493D_A1B6_commonFunctions, TLx493D_A1B6_e, TLx493D_I2C_e);
+bool TLx493D_A1B6_init(TLx493D_t *sensor, uint8_t *regMap) {
+  return tlx493d_common_init(sensor, GEN_1_REG_MAP_SIZE, TLx493D_A1B6_regDef,
+                             &TLx493D_A1B6_commonFunctions, TLx493D_A1B6_e,
+                             TLx493D_I2C_e);
 }
 
 bool TLx493D_A1B6_deinit(TLx493D_t *sensor) {

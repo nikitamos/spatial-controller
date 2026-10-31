@@ -23,45 +23,46 @@
 
 
 /** functions common to all sensors. */
-bool tlx493d_init(TLx493D_t *sensor, TLx493D_SupportedSensorType_t sensorType) {
-   switch(sensorType) {
+bool tlx493d_init(TLx493D_t *sensor, TLx493D_SupportedSensorType_t sensorType,
+                  uint8_t *regMap) {
+  switch (sensorType) {
 
-      case TLx493D_A1B6_e : return TLx493D_A1B6_init(sensor);
-                            break;                              
+  case TLx493D_A1B6_e:
+    return TLx493D_A1B6_init(sensor, regMap);
+    break;
 
+  case TLx493D_A2B6_e:
+    return TLx493D_A2B6_init(sensor, regMap);
+    break;
 
-      case TLx493D_A2B6_e : return TLx493D_A2B6_init(sensor);
-                            break;
+  case TLx493D_A2BW_e:
+    return TLx493D_A2BW_init(sensor, regMap);
+    break;
 
+  case TLx493D_P2B6_e:
+    return TLx493D_P2B6_init(sensor, regMap);
+    break;
 
-      case TLx493D_A2BW_e : return TLx493D_A2BW_init(sensor);
-                            break;
+  case TLx493D_W2B6_e:
+    return TLx493D_W2B6_init(sensor, regMap);
+    break;
 
+  case TLx493D_W2BW_e:
+    return TLx493D_W2BW_init(sensor, regMap);
+    break;
 
-      case TLx493D_P2B6_e : return TLx493D_P2B6_init(sensor);
-                            break;
+  case TLx493D_P3B6_e:
+    return TLx493D_P3B6_init(sensor, regMap);
+    break;
 
+  case TLx493D_P3I8_e:
+    return TLx493D_P3I8_init(sensor, regMap);
+    break;
 
-      case TLx493D_W2B6_e : return TLx493D_W2B6_init(sensor);
-                            break;
-
-
-      case TLx493D_W2BW_e : return TLx493D_W2BW_init(sensor);
-                            break;
-
-
-      case TLx493D_P3B6_e : return TLx493D_P3B6_init(sensor);
-                            break;
-
-
-      case TLx493D_P3I8_e : return TLx493D_P3I8_init(sensor);
-                            break;
-
-
-      default : return false;
-   }
+  default:
+    return false;
+  }
 }
-
 
 bool tlx493d_deinit(TLx493D_t *sensor) {
    return sensor->functions->deinit(sensor);

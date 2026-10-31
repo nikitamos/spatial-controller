@@ -32,7 +32,7 @@ typedef struct{
 
 
 /** common functions. */
-bool TLx493D_A1B6_init(TLx493D_t *sensor);
+bool TLx493D_A1B6_init(TLx493D_t *sensor, uint8_t *regMap);
 bool TLx493D_A1B6_deinit(TLx493D_t *sensor);
 
 bool TLx493D_A1B6_readRegisters(TLx493D_t *sensor);

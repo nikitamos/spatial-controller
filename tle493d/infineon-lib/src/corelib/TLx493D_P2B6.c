@@ -20,57 +20,55 @@
 #include "TLx493D_P2B6_enums.h"
 #include "TLx493D_P2B6.h"
 
-
-static TLx493D_Register_t TLx493D_P2B6_regDef[] = {
-    { /* P2B6_BX_MSBS_e, */    TLx493D_READ_MODE_e,        0x00, 0xFF, 0, 8 },
-    { /* P2B6_BY_MSBS_e, */    TLx493D_READ_MODE_e,        0x01, 0xFF, 0, 8 },
-    { /* P2B6_BZ_MSBS_e, */    TLx493D_READ_MODE_e,        0x02, 0xFF, 0, 8 },
-    { /* P2B6_TEMP_MSBS_e, */  TLx493D_READ_MODE_e,        0x03, 0xFF, 0, 8 },
-    { /* P2B6_BX_LSBS_e, */    TLx493D_READ_MODE_e,        0x04, 0xF0, 4, 4 },
-    { /* P2B6_BY_LSBS_e, */    TLx493D_READ_MODE_e,        0x04, 0x0F, 0, 4 },
-    { /* P2B6_TEMP_LSBS_e, */  TLx493D_READ_MODE_e,        0x05, 0xC0, 6, 2 },
-    { /* P2B6_ID_e, */         TLx493D_READ_MODE_e,        0x05, 0x30, 4, 2 },
-    { /* P2B6_BZ_LSBS_e, */    TLx493D_READ_MODE_e,        0x05, 0x0F, 0, 4 },
-    { /* P2B6_P_e, */          TLx493D_READ_MODE_e,        0x06, 0x80, 7, 1 },
-    { /* P2B6_FF_e, */         TLx493D_READ_MODE_e,        0x06, 0x40, 6, 1 },
-    { /* P2B6_CF_e, */         TLx493D_READ_MODE_e,        0x06, 0x20, 5, 1 },
-    { /* P2B6_T_e, */          TLx493D_READ_MODE_e,        0x06, 0x10, 4, 1 },
-    { /* P2B6_PD3_e, */        TLx493D_READ_MODE_e,        0x06, 0x08, 3, 1 },
-    { /* P2B6_PD0_e, */        TLx493D_READ_MODE_e,        0x06, 0x04, 2, 1 },
-    { /* P2B6_FRM_e, */        TLx493D_READ_MODE_e,        0x06, 0x03, 0, 2 },
-    { /* P2B6_XL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x07, 0xFF, 0, 8 },
-    { /* P2B6_XH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x08, 0xFF, 0, 8 },
-    { /* P2B6_YL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x09, 0xFF, 0, 8 },
-    { /* P2B6_YH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0A, 0xFF, 0, 8 },
-    { /* P2B6_ZL_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0B, 0xFF, 0, 8 },
-    { /* P2B6_ZH_MSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0C, 0xFF, 0, 8 },
-    { /* P2B6_WA_e, */         TLx493D_READ_MODE_e,        0x0D, 0x80, 7, 1 },
-    { /* P2B6_WU_e, */         TLx493D_READ_WRITE_MODE_e,  0x0D, 0x40, 6, 1 },
-    { /* P2B6_XH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0D, 0x38, 3, 3 },
-    { /* P2B6_XL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0D, 0x07, 0, 3 },
-    { /* P2B6_TST_e, */        TLx493D_READ_WRITE_MODE_e,  0x0E, 0xC0, 6, 2 },
-    { /* P2B6_YH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0E, 0x38, 3, 3 },  
-    { /* P2B6_YL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0E, 0x07, 0, 3 },
-    { /* P2B6_PH_e, */         TLx493D_READ_WRITE_MODE_e,  0x0F, 0xC0, 6, 2 },
-    { /* P2B6_ZH_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0F, 0x38, 3, 3 },
-    { /* P2B6_ZL_LSBS_e, */    TLx493D_READ_WRITE_MODE_e,  0x0F, 0x07, 0, 3 },
-    { /* P2B6_DT_e, */         TLx493D_READ_WRITE_MODE_e,  0x10, 0x80, 7, 1 },
-    { /* P2B6_AM_e, */         TLx493D_READ_WRITE_MODE_e,  0x10, 0x40, 6, 1 },
-    { /* P2B6_TRIG_e, */       TLx493D_READ_WRITE_MODE_e,  0x10, 0x30, 4, 2 },
-    { /* P2B6_X2_e, */         TLx493D_READ_WRITE_MODE_e,  0x10, 0x08, 3, 1 },
-    { /* P2B6_TL_MAG_e, */     TLx493D_READ_WRITE_MODE_e,  0x10, 0x06, 1, 2 },
-    { /* P2B6_CP_e, */         TLx493D_READ_WRITE_MODE_e,  0x10, 0x01, 0, 1 },
-    { /* P2B6_FP_e, */         TLx493D_READ_WRITE_MODE_e,  0x11, 0x80, 7, 1 },
-    { /* P2B6_IICADR_e, */     TLx493D_READ_WRITE_MODE_e,  0x11, 0x60, 5, 2 },
-    { /* P2B6_PR_e, */         TLx493D_READ_WRITE_MODE_e,  0x11, 0x10, 4, 1 },
-    { /* P2B6_CA_e, */         TLx493D_READ_WRITE_MODE_e,  0x11, 0x08, 3, 1 },
-    { /* P2B6_INT_e, */        TLx493D_READ_WRITE_MODE_e,  0x11, 0x04, 2, 1 },
-    { /* P2B6_MODE_e, */       TLx493D_READ_WRITE_MODE_e,  0x11, 0x03, 0, 2 },
-    { /* P2B6_PRD_e, */        TLx493D_READ_WRITE_MODE_e,  0x13, 0xE0, 5, 3 },
-    { /* P2B6_TYPE_e, */       TLx493D_READ_MODE_e,        0x16, 0x30, 4, 2 },
-    { /* P2B6_HWV_e, */        TLx493D_READ_MODE_e,        0x16, 0x0F, 0, 4 },
+static const TLx493D_Register_t TLx493D_P2B6_regDef[] = {
+    {/* P2B6_BX_MSBS_e, */ TLx493D_READ_MODE_e, 0x00, 0xFF, 0, 8},
+    {/* P2B6_BY_MSBS_e, */ TLx493D_READ_MODE_e, 0x01, 0xFF, 0, 8},
+    {/* P2B6_BZ_MSBS_e, */ TLx493D_READ_MODE_e, 0x02, 0xFF, 0, 8},
+    {/* P2B6_TEMP_MSBS_e, */ TLx493D_READ_MODE_e, 0x03, 0xFF, 0, 8},
+    {/* P2B6_BX_LSBS_e, */ TLx493D_READ_MODE_e, 0x04, 0xF0, 4, 4},
+    {/* P2B6_BY_LSBS_e, */ TLx493D_READ_MODE_e, 0x04, 0x0F, 0, 4},
+    {/* P2B6_TEMP_LSBS_e, */ TLx493D_READ_MODE_e, 0x05, 0xC0, 6, 2},
+    {/* P2B6_ID_e, */ TLx493D_READ_MODE_e, 0x05, 0x30, 4, 2},
+    {/* P2B6_BZ_LSBS_e, */ TLx493D_READ_MODE_e, 0x05, 0x0F, 0, 4},
+    {/* P2B6_P_e, */ TLx493D_READ_MODE_e, 0x06, 0x80, 7, 1},
+    {/* P2B6_FF_e, */ TLx493D_READ_MODE_e, 0x06, 0x40, 6, 1},
+    {/* P2B6_CF_e, */ TLx493D_READ_MODE_e, 0x06, 0x20, 5, 1},
+    {/* P2B6_T_e, */ TLx493D_READ_MODE_e, 0x06, 0x10, 4, 1},
+    {/* P2B6_PD3_e, */ TLx493D_READ_MODE_e, 0x06, 0x08, 3, 1},
+    {/* P2B6_PD0_e, */ TLx493D_READ_MODE_e, 0x06, 0x04, 2, 1},
+    {/* P2B6_FRM_e, */ TLx493D_READ_MODE_e, 0x06, 0x03, 0, 2},
+    {/* P2B6_XL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x07, 0xFF, 0, 8},
+    {/* P2B6_XH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x08, 0xFF, 0, 8},
+    {/* P2B6_YL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x09, 0xFF, 0, 8},
+    {/* P2B6_YH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0A, 0xFF, 0, 8},
+    {/* P2B6_ZL_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0B, 0xFF, 0, 8},
+    {/* P2B6_ZH_MSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0C, 0xFF, 0, 8},
+    {/* P2B6_WA_e, */ TLx493D_READ_MODE_e, 0x0D, 0x80, 7, 1},
+    {/* P2B6_WU_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x40, 6, 1},
+    {/* P2B6_XH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x38, 3, 3},
+    {/* P2B6_XL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0D, 0x07, 0, 3},
+    {/* P2B6_TST_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0xC0, 6, 2},
+    {/* P2B6_YH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0x38, 3, 3},
+    {/* P2B6_YL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0E, 0x07, 0, 3},
+    {/* P2B6_PH_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0xC0, 6, 2},
+    {/* P2B6_ZH_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0x38, 3, 3},
+    {/* P2B6_ZL_LSBS_e, */ TLx493D_READ_WRITE_MODE_e, 0x0F, 0x07, 0, 3},
+    {/* P2B6_DT_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x80, 7, 1},
+    {/* P2B6_AM_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x40, 6, 1},
+    {/* P2B6_TRIG_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x30, 4, 2},
+    {/* P2B6_X2_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x08, 3, 1},
+    {/* P2B6_TL_MAG_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x06, 1, 2},
+    {/* P2B6_CP_e, */ TLx493D_READ_WRITE_MODE_e, 0x10, 0x01, 0, 1},
+    {/* P2B6_FP_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x80, 7, 1},
+    {/* P2B6_IICADR_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x60, 5, 2},
+    {/* P2B6_PR_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x10, 4, 1},
+    {/* P2B6_CA_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x08, 3, 1},
+    {/* P2B6_INT_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x04, 2, 1},
+    {/* P2B6_MODE_e, */ TLx493D_READ_WRITE_MODE_e, 0x11, 0x03, 0, 2},
+    {/* P2B6_PRD_e, */ TLx493D_READ_WRITE_MODE_e, 0x13, 0xE0, 5, 3},
+    {/* P2B6_TYPE_e, */ TLx493D_READ_MODE_e, 0x16, 0x30, 4, 2},
+    {/* P2B6_HWV_e, */ TLx493D_READ_MODE_e, 0x16, 0x0F, 0, 4},
 };
-
 
 static TLx493D_CommonFunctions_t TLx493D_P2B6_commonFunctions = {
     .init                           = TLx493D_P2B6_init,
@@ -156,11 +154,11 @@ static TLx493D_CommonFunctions_t TLx493D_P2B6_commonFunctions = {
     .getSensitivityScaleFactor      = TLx493D_P2B6_getSensitivityScaleFactor,
 };
 
-
-bool TLx493D_P2B6_init(TLx493D_t *sensor) {
-    return tlx493d_common_init(sensor, GEN_2_REG_MAP_SIZE, TLx493D_P2B6_regDef, &TLx493D_P2B6_commonFunctions, TLx493D_P2B6_e, TLx493D_I2C_e);
+bool TLx493D_P2B6_init(TLx493D_t *sensor, uint8_t *regMap) {
+  return tlx493d_common_init(sensor, GEN_2_REG_MAP_SIZE, TLx493D_P2B6_regDef,
+                             &TLx493D_P2B6_commonFunctions, TLx493D_P2B6_e,
+                             TLx493D_I2C_e);
 }
-
 
 bool TLx493D_P2B6_deinit(TLx493D_t *sensor) {
     return tlx493d_common_deinit(sensor);

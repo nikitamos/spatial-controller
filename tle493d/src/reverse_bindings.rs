@@ -76,12 +76,14 @@ unsafe extern "C" fn tlx493d_setReadAddress(sensor: *mut TLx493D_t, address: u8)
 #[unsafe(no_mangle)]
 unsafe extern "C" fn real_round(x: Float) -> c_long {
     // This function replaces lround() from libc
-    unsafe {x.to_int_unchecked()}
+    unsafe { x.to_int_unchecked() }
 }
 
+#[cfg_attr(not(feature = "defmt"), allow(unused))]
 pub mod logging {
     use core::{
-        ffi::{CStr, c_char}, slice,
+        ffi::{CStr, c_char},
+        slice,
     };
 
     use crate::bindings::TLx493D_t;
@@ -114,6 +116,7 @@ pub mod logging {
         ($name:ident) => {
             #[unsafe(no_mangle)]
             unsafe extern "C" fn $name(level: u8, fmt: *const c_char) {
+                #[cfg(feature = "defmt")]
                 unsafe {
                     let s = make_str(fmt);
                     log_message!(level, s);
@@ -123,6 +126,7 @@ pub mod logging {
         ($name:ident($conv1:ident($ty1:ty))) => {
             #[unsafe(no_mangle)]
             unsafe extern "C" fn $name(level: u8, fmt: *const c_char, a1: $ty1) {
+                #[cfg(feature = "defmt")]
                 unsafe {
                     let s = make_str(fmt);
                     let p = Printable {
@@ -138,6 +142,7 @@ pub mod logging {
         ($name:ident($conv1:ident($ty1:ty), $conv2:ident($ty2:ty))) => {
             #[unsafe(no_mangle)]
             unsafe extern "C" fn $name(level: u8, fmt: *const c_char, a1: $ty1, a2: $ty2) {
+                #[cfg(feature = "defmt")]
                 unsafe {
                     let s = make_str(fmt);
                     let p = Printable {
@@ -159,6 +164,7 @@ pub mod logging {
                 a2: $ty2,
                 a3: $ty3,
             ) {
+                #[cfg(feature = "defmt")]
                 unsafe {
                     let s = make_str(fmt);
                     let p = Printable {
@@ -183,6 +189,7 @@ pub mod logging {
     declare_log_fn!(logPrintds(id(i32), make_str(*const c_char)));
     declare_log_fn!(logPrintdd(id(i32), id(i32)));
 
+    #[cfg(feature = "defmt")]
     struct Printable<'s, T1: defmt::Format, T2: defmt::Format, T3: defmt::Format> {
         format: &'s str,
         arg1: T1,
@@ -190,6 +197,7 @@ pub mod logging {
         arg3: T3,
     }
 
+    #[cfg(feature = "defmt")]
     impl<'s, T1: defmt::Format, T2: defmt::Format, T3: defmt::Format> defmt::Format
         for Printable<'s, T1, T2, T3>
     {
@@ -207,14 +215,18 @@ pub mod logging {
 
     #[unsafe(no_mangle)]
     extern "C" fn logPrintRegisters(sensor: &TLx493D_t, headline: *const c_char) {
-        if !headline.is_null() {
-            unsafe {
-                defmt::info!("{}", make_str(headline));
+    #[cfg(feature = "defmt")]
+        {
+            if !headline.is_null() {
+                unsafe {
+                    defmt::info!("{}", make_str(headline));
+                }
             }
-        }
-        let reg_map = unsafe { slice::from_raw_parts(sensor.regMap, sensor.regMapSize as usize) };
-        for (reg, val) in reg_map.iter().enumerate() {
-            defmt::info!("{:02X} = {:02X}", reg, val);
+            let reg_map =
+                unsafe { slice::from_raw_parts(sensor.regMap, sensor.regMapSize as usize) };
+            for (reg, val) in reg_map.iter().enumerate() {
+                defmt::info!("{:02X} = {:02X}", reg, val);
+            }
         }
     }
 }

@@ -4,7 +4,7 @@
 
 /** project c includes. */
 #include "tlx493d_types.h"
-
+#include <stdint.h>
 
 #ifdef __cplusplus
 
@@ -16,7 +16,8 @@ bool tlx493d_common_init(TLx493D_t *sensor, uint8_t regMapSize,
                          const TLx493D_Register_t *regDef,
                          TLx493D_CommonFunctions_t *commonFuncs,
                          TLx493D_SupportedSensorType_t sensorType,
-                         TLx493D_SupportedComLibraryInterfaceType_t comIFType);
+                         TLx493D_SupportedComLibraryInterfaceType_t comIFType,
+                         uint8_t *regMap);
 bool tlx493d_common_deinit(TLx493D_t *sensor);
 
 

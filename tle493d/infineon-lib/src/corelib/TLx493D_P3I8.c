@@ -164,7 +164,7 @@ static TLx493D_CommonFunctions_t TLx493D_P3I8_commonFunctions = {
 bool TLx493D_P3I8_init(TLx493D_t *sensor, uint8_t *regMap) {
   return tlx493d_common_init(sensor, GEN_3_REG_MAP_SIZE, TLx493D_P3I8_regDef,
                              &TLx493D_P3I8_commonFunctions, TLx493D_P3I8_e,
-                             TLx493D_SPI_e);
+                             TLx493D_SPI_e, regMap);
 }
 
 bool TLx493D_P3I8_deinit(TLx493D_t *sensor) {

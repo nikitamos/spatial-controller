@@ -9,13 +9,13 @@ pub enum Error {
 }
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
-use core::marker::PhantomData;
+use core::{arch::asm, ffi::{c_double, c_long}, marker::PhantomData};
 
 use embedded_hal::i2c::I2c;
 
 use crate::{bindings::TLx493D_t, types::SensorType};
 
-#[allow(non_camel_case_types, non_snake_case, dead_code)]
+#[allow(non_camel_case_types, non_snake_case, non_upper_case_globals, dead_code)]
 mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
@@ -62,8 +62,8 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         i2c: &'m mut i2c::I2cInterface<I>,
         vtable: &'m i2c::I2cInterfaceVTable<I>,
     ) -> Result<Self> {
-        // Safety: tle outlives `reg_map`, `vtable` and `i2c` since it is enclosed
-        // in `Self` which validity for `'m` is ensured by borrow checker
+        // Safety: `tle` is outlived by `reg_map`, `vtable` and `i2c` since it is enclosed
+        // in `Self` which is valid for `'m`
         let mut tle = unsafe { init_tle_struct::<S>(reg_map)? };
         unsafe { i2c::init_communication(&mut tle, i2c, vtable, typ.address_raw()) };
         Ok(Self {
@@ -71,4 +71,10 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
             _p: PhantomData,
         })
     }
+
 }
+
+// #[unsafe(no_mangle)]
+// unsafe extern "C" fn lround(x: c_double) -> c_long {
+//     unsafe {x.to_int_unchecked()}
+// }

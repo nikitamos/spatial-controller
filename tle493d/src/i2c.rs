@@ -52,8 +52,11 @@ impl<I: I2c> I2cInterfaceVTable<I> {
 }
 
 impl<I: I2c> I2cInterface<I> {
-    pub fn new(i2c: I) -> Self {
+    pub const fn new(i2c: I) -> Self {
         Self { i2c }
+    }
+    pub const fn vtable_copy(&self) -> I2cInterfaceVTable<I> {
+        I2cInterfaceVTable::new()
     }
 }
 /// # Safety

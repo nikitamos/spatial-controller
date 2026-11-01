@@ -146,7 +146,7 @@ static TLx493D_CommonFunctions_t TLx493D_A2BW_commonFunctions = {
 bool TLx493D_A2BW_init(TLx493D_t *sensor, uint8_t *regMap) {
   return tlx493d_common_init(sensor, GEN_2_REG_MAP_SIZE, TLx493D_A2BW_regDef,
                              &TLx493D_A2BW_commonFunctions, TLx493D_A2BW_e,
-                             TLx493D_I2C_e);
+                             TLx493D_I2C_e, regMap);
 }
 
 bool TLx493D_A2BW_deinit(TLx493D_t *sensor) {

@@ -1,6 +1,8 @@
 //! This module provides functions that are required by the Infineon library
 //! to function properly.
 
+use core::ffi::c_long;
+
 use crate::{
     Float,
     bindings::{
@@ -71,13 +73,18 @@ unsafe extern "C" fn tlx493d_setReadAddress(sensor: *mut TLx493D_t, address: u8)
     }
 }
 
-// unsafe extern "C" fn round_real(x: Float) -> c_long {
-//     // This function is meant to replace lround()
-//     x.to_int_unchecked()
-// }
+#[unsafe(no_mangle)]
+unsafe extern "C" fn real_round(x: Float) -> c_long {
+    // This function replaces lround() from libc
+    unsafe {x.to_int_unchecked()}
+}
 
 pub mod logging {
-    use core::ffi::{CStr, c_char};
+    use core::{
+        ffi::{CStr, c_char}, slice,
+    };
+
+    use crate::bindings::TLx493D_t;
     unsafe fn make_str<'s>(x: *const c_char) -> &'s str {
         if x.is_null() {
             ""
@@ -195,6 +202,19 @@ pub mod logging {
                 self.arg2,
                 self.arg3
             )
+        }
+    }
+
+    #[unsafe(no_mangle)]
+    extern "C" fn logPrintRegisters(sensor: &TLx493D_t, headline: *const c_char) {
+        if !headline.is_null() {
+            unsafe {
+                defmt::info!("{}", make_str(headline));
+            }
+        }
+        let reg_map = unsafe { slice::from_raw_parts(sensor.regMap, sensor.regMapSize as usize) };
+        for (reg, val) in reg_map.iter().enumerate() {
+            defmt::info!("{:02X} = {:02X}", reg, val);
         }
     }
 }

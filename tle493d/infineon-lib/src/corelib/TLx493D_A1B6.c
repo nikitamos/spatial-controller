@@ -637,9 +637,9 @@ void TLx493D_A1B6_calculateRawMagneticFieldAtTemperature(
   (void)rawTemp;
   (void)sens;
 
-  *x = (int16_t)lround(xInmT / GEN_1_MAG_FIELD_MULT);
-  *y = (int16_t)lround(yInmT / GEN_1_MAG_FIELD_MULT);
-  *z = (int16_t)lround(zInmT / GEN_1_MAG_FIELD_MULT);
+  *x = (int16_t)real_round(xInmT / GEN_1_MAG_FIELD_MULT);
+  *y = (int16_t)real_round(yInmT / GEN_1_MAG_FIELD_MULT);
+  *z = (int16_t)real_round(zInmT / GEN_1_MAG_FIELD_MULT);
 }
 
 real TLx493D_A1B6_getSensitivityScaleFactor(const TLx493D_t *sensor) {

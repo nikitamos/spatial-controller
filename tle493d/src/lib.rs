@@ -189,6 +189,6 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
 pub mod reverse_bindings;
 
 // #[unsafe(no_mangle)]
-// unsafe extern "C" fn lround(x: c_double) -> c_long {
+// unsafe extern "C" fn real_round(x: c_double) -> c_long {
 //     unsafe {x.to_int_unchecked()}
 // }

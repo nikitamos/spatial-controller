@@ -15,4 +15,10 @@ typedef double real;
 typedef float real;
 #endif
 
+/// Rounds argument to the nearest integer value, rounding halfway cases away
+/// from zero.
+/// This function is equivalent to C99 `lround`.
+/// If x is out of range, NaN or infinite, this function causes UB.
+long real_round(real x);
+
 #endif // TLX493D_PAL_H

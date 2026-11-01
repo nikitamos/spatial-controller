@@ -332,8 +332,11 @@ bool tlx493d_gen_3_enableWakeUpMode(TLx493D_t *sensor, uint8_t wuBF, uint8_t wuc
     bool b = true;
 
     if( sensor->functions->isInTestMode(sensor) ) {
-        logWarn("Sensor %s was in test mode, changed to normal mode in order to enable wake up !", tlx493d_common_getTypeAsString(sensor));
-        b &= sensor->functions->setMeasurement(sensor, TLx493D_BxByBzTemp_e);
+      logPrints(LEVEL_WARN,
+                "Sensor %s was in test mode, changed to normal mode in order "
+                "to enable wake up !",
+                tlx493d_common_getTypeAsString(sensor));
+      b &= sensor->functions->setMeasurement(sensor, TLx493D_BxByBzTemp_e);
     }
 
     tlx493d_common_setBitfield(sensor, wuBF, 1);
@@ -342,8 +345,11 @@ bool tlx493d_gen_3_enableWakeUpMode(TLx493D_t *sensor, uint8_t wuBF, uint8_t wuc
     b &= sensor->functions->readRegisters(sensor);
 
     if( ! sensor->functions->hasValidWakeUpParity(sensor) ) {
-        logError("Wake up parity is not correct, cannot enter wake up mode for sensor %s !", tlx493d_common_getTypeAsString(sensor));
-        return false;
+      logPrints(LEVEL_ERROR,
+                "Wake up parity is not correct, cannot enter wake up mode for "
+                "sensor %s !",
+                tlx493d_common_getTypeAsString(sensor));
+      return false;
     }
 
     return b;

@@ -46,19 +46,15 @@ bool tlx493d_common_init(TLx493D_t *sensor, uint8_t regMapSize,
  * 
 */
 bool tlx493d_common_deinit(TLx493D_t *sensor) {
-    if( sensor->regMap != NULL ) {
-        free(sensor->regMap);
-        sensor->regMap = NULL;
-    }
+  sensor->regMap = NULL;
 
-    sensor->comInterface.comLibFuncs                       = NULL;
-    sensor->comInterface.comLibObj.iic_obj                 = NULL;
+  sensor->comInterface.comLibFuncs = NULL;
+  sensor->comInterface.comLibObj.iic_obj = NULL;
 
-    sensor->boardSupportInterface.boardSupportObj.k2go_obj = NULL;
-    
-    return true;
+  sensor->boardSupportInterface.boardSupportObj.k2go_obj = NULL;
+
+  return true;
 }
-
 
 static bool tlx493d_hasNotOnly0xFFInRegmap(const TLx493D_t *sensor) {
     /** Skip address 0 ! Seems to be ok even if other entries are not. */
@@ -149,7 +145,8 @@ bool tlx493d_common_readRegistersAndCheck(TLx493D_t *sensor) {
     } while( --loops >= 0 );
 
     if( ! sensor->functions->hasValidData(sensor) ) {
-        logError("Cannot read consistent data from device '%s' !", tlx493d_common_getTypeAsString(sensor));
+      logPrints(LEVEL_ERROR, "Cannot read consistent data from device '%s' !",
+                tlx493d_common_getTypeAsString(sensor));
     }
 
     return true;
@@ -360,26 +357,33 @@ void tlx493d_common_setIICAddress(TLx493D_t *sensor, uint8_t addr) {
 
 
 void tlx493d_warnFeatureNotAvailableForSensorType(const TLx493D_t *sensor, const char *featureName) {
-    logWarn("Feature '%s' not available for sensor type '%s' !", featureName, tlx493d_common_getTypeAsString(sensor));
+  logPrintss(LEVEL_WARN, "Feature '%s' not available for sensor type '%s' !",
+             featureName, tlx493d_common_getTypeAsString(sensor));
 }
 
 
 void tlx493d_errorBitfieldNotReadableForSensorType(const TLx493D_t *sensor, uint8_t bf) {
-    logError("Bitfield '%d' not readable for sensor type '%s' !", bf, tlx493d_common_getTypeAsString(sensor));
+  logPrintds(LEVEL_ERROR, "Bitfield '%d' not readable for sensor type '%s' !",
+             bf, tlx493d_common_getTypeAsString(sensor));
 }
 
 
 void tlx493d_errorBitfieldNotWritableForSensorType(const TLx493D_t *sensor, uint8_t bf) {
-    logError("Bitfield '%d' not writable for sensor type '%s' !", bf, tlx493d_common_getTypeAsString(sensor));
+  logPrintds(LEVEL_ERROR, "Bitfield '%d' not writable for sensor type '%s' !",
+             bf, tlx493d_common_getTypeAsString(sensor));
 }
 
 
 void tlx493d_errorFunctionNotSupportedForSensorType(const TLx493D_t *sensor, const char *func) {
-    logError("Function '%s' not supported for sensor type '%s' !", func, tlx493d_common_getTypeAsString(sensor));
+  logPrintss(LEVEL_ERROR, "Function '%s' not supported for sensor type '%s' !",
+             func, tlx493d_common_getTypeAsString(sensor));
 }
 
 
 void tlx493d_errorSelectionNotSupportedForSensorType(const TLx493D_t *sensor, uint8_t sel, const char *selType) {
-    logError("Selection '%d' for type '%s' not supported for sensor type '%s' !", sel, selType, tlx493d_common_getTypeAsString(sensor));
+  logPrintdss(
+      LEVEL_ERROR,
+      "Selection '%d' for type '%s' not supported for sensor type '%s' !", sel,
+      selType, tlx493d_common_getTypeAsString(sensor));
 }
 

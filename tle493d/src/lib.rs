@@ -73,7 +73,7 @@ pub struct Tlx493d<'m, I: I2c> {
     _p: PhantomData<&'m mut I>,
 }
 
-pub type MagneticField = [i16; 3];
+pub type MagneticField<T = i16> = [T; 3];
 pub type Float = bindings::real;
 
 impl<'m, I: I2c> Tlx493d<'m, I> {
@@ -97,16 +97,14 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
     /// It is reading out the complete register map of the sensor and is saving the current
     /// values to the "internal" register map of the sensor object.
     pub fn read_registers(&mut self) -> Result<()> {
-        unsafe { bindings::tlx493d_readRegisters(&raw mut self.tle).ok_or_unknown(()) }
+        unsafe { bindings::tlx493d_readRegisters(&mut self.tle).ok_or_unknown(()) }
     }
 
     /// Retrieves the raw temperature from a TLx493D sensor.
     /// The function is reading out the temperature registers of the sensor and is returning its value as LSB.
     pub fn get_raw_temperature(&mut self) -> Result<i16> {
         let mut res = 0;
-        unsafe {
-            bindings::tlx493d_getRawTemperature(&raw mut self.tle, &raw mut res).ok_or_unknown(res)
-        }
+        unsafe { bindings::tlx493d_getRawTemperature(&mut self.tle, &mut res).ok_or_unknown(res) }
     }
 
     /// Retrieves the raw magnetic field values from a TLx493D sensor.
@@ -116,10 +114,10 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         let mut field = [0; 3];
         unsafe {
             bindings::tlx493d_getRawMagneticField(
-                &raw mut self.tle,
-                &raw mut field[0],
-                &raw mut field[1],
-                &raw mut field[2],
+                &mut self.tle,
+                &mut field[0],
+                &mut field[1],
+                &mut field[2],
             )
             .ok_or_unknown(field)
         }
@@ -133,18 +131,62 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         let mut temp: i16 = 0;
         unsafe {
             bindings::tlx493d_getRawMagneticFieldAndTemperature(
-                &raw mut self.tle,
-                &raw mut field[0],
-                &raw mut field[1],
-                &raw mut field[2],
-                &raw mut temp,
-            ).ok_or_unknown((field, temp))
+                &mut self.tle,
+                &mut field[0],
+                &mut field[1],
+                &mut field[2],
+                &mut temp,
+            )
+            .ok_or_unknown((field, temp))
+        }
+    }
+    /// Retrieves the temperature from a TLx493D sensor in °C. The function is reading
+    /// out the temperature registers of the sensor and converts the values into °C with
+    /// the formula that is provided in the datasheet of the sensor.
+    pub fn get_temperature(&mut self) -> Result<Float> {
+        let mut temp = 0.0;
+        unsafe { bindings::tlx493d_getTemperature(&mut self.tle, &mut temp).ok_or_unknown(temp) }
+    }
+
+    /// Retrieves the magnetic field values from a TLx493D sensor. The function is reading
+    /// out the magnetic field value registers of the sensor and is converting the retrieved
+    /// data into values in mT for each magnetic field axis.
+    pub fn get_magnetic_field(&mut self) -> Result<MagneticField<Float>> {
+        let mut field = [0.0; 3];
+        unsafe {
+            bindings::tlx493d_getMagneticField(
+                &mut self.tle,
+                &mut field[0],
+                &mut field[1],
+                &mut field[2],
+            )
+            .ok_or_unknown(field)
         }
     }
 
-    // pub fn 
+    /// The function retrieves the magnetic field and temperature readings from a TLx493D sensor.
+    /// it combines the two functions [`Self::get_temperature`] and [`Self::get_magnetic_field`] in
+    /// order to have one function which is providing the temperature as well as the
+    /// magnetic field values of the sensor.
+    pub fn get_magnetic_field_and_temperature(&mut self) -> Result<(MagneticField<Float>, Float)> {
+        let mut field = [0.0; 3];
+        let mut temp = 0.0;
+        unsafe {
+            bindings::tlx493d_getMagneticFieldAndTemperature(
+                &mut self.tle,
+                &mut field[0],
+                &mut field[1],
+                &mut field[2],
+                &mut temp,
+            )
+            .ok_or_unknown((field, temp))
+        }
+    }
 
+    // TODO: set measurement, set trigger, sensitivity, default config, i2c address, collision avoidance
 }
+
+pub mod reverse_bindings;
 
 // #[unsafe(no_mangle)]
 // unsafe extern "C" fn lround(x: c_double) -> c_long {

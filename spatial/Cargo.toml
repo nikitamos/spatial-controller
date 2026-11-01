@@ -40,7 +40,7 @@ embassy-usb = { version = "0.6.0", features = [
     "max-handler-count-8",
 ] }
 embassy-futures = "0.1.2"
-tle493d = { version = "0.1.0", path = "../tle493d" }
+tle493d = { version = "0.1.0", path = "../tle493d", features = ["default", "defmt"]}
 embassy-sync = "0.8.0"
 zerocopy.workspace=true
 usbd-hid.workspace=true

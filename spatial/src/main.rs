@@ -17,6 +17,7 @@ use spatial::orientation::{OrientationModule, OrientationModuleConfig};
 use spatial::status::{StatusModule, StatusModuleBuilder};
 use spatial::usb::{UsbHidProvider, UsbHidProviderBuilder};
 use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
+use tle493d::types::SensorType;
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
@@ -62,6 +63,13 @@ async fn main(spawner: Spawner) {
     i2c_cfg.sda_pullup = true;
     let _i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
     info!("i2c created");
+
+    let mut i2c_iface = tle493d::i2c::I2cInterface::new(_i2c);
+    let mut regmap = [0; tle493d::types::W2B6::REG_MAP_SIZE];
+    let vtbl = i2c_iface.vtable_copy();
+    let mut tle = tle493d::Tlx493d::new(tle493d::types::W2B6::A0, &mut regmap, &mut i2c_iface, &vtbl).unwrap();
+    let field = tle.get_magnetic_field().unwrap();
+    defmt::info!("measured field: {}", &field);
 
     // let mut mag = TLE493DW2B6::new(
     //     i2c,

@@ -43,49 +43,53 @@ void setup() {
  *  the serial monitor.
  */
 void loop() {
-    double t, x, y, z;
+  real t, x, y, z;
 
-    tlx493d_getMagneticFieldAndTemperature(&dut, &x, &y, &z, &t);
-    tlx493d_printRegisters(&dut);
+  tlx493d_getMagneticFieldAndTemperature(&dut, &x, &y, &z, &t);
+  tlx493d_printRegisters(&dut);
 
-    Serial.print("\nTemperature is: ");
-    Serial.print(t);
-    Serial.println("°C");
+  Serial.print("\nTemperature is: ");
+  Serial.print(t);
+  Serial.println("°C");
 
-    Serial.print("Value X is: ");
-    Serial.print(x);
-    Serial.println(" mT");
-    Serial.print("Value Y is: ");
-    Serial.print(y);
-    Serial.println(" mT");
-    Serial.print("Value Z is: ");
-    Serial.print(z);
-    Serial.println(" mT");
+  Serial.print("Value X is: ");
+  Serial.print(x);
+  Serial.println(" mT");
+  Serial.print("Value Y is: ");
+  Serial.print(y);
+  Serial.println(" mT");
+  Serial.print("Value Z is: ");
+  Serial.print(z);
+  Serial.println(" mT");
 
-    delay(1000);
+  delay(1000);
 
-    Serial.print("count : ");
-    Serial.println(count);
+  Serial.print("count : ");
+  Serial.println(count);
 
-    if( ++count == 5 ) {
-        Serial.println("\nBefore reset -------------------------------------------------------------------------------------------------------");
+  if (++count == 5) {
+    Serial.println("\nBefore reset "
+                   "-----------------------------------------------------------"
+                   "--------------------------------------------");
 
-        // If reset fails for A1B6 and W2BW : check drive strength of power pin !
-        ifx::tlx493d::deinitCommunication(&dut, sensorType != TLx493D_A1B6_e);
-        dut.functions->deinit(&dut);
+    // If reset fails for A1B6 and W2BW : check drive strength of power pin !
+    ifx::tlx493d::deinitCommunication(&dut, sensorType != TLx493D_A1B6_e);
+    dut.functions->deinit(&dut);
 
-        digitalWrite(POWER_PIN, LOW);
-        delayMicroseconds(250000UL);
+    digitalWrite(POWER_PIN, LOW);
+    delayMicroseconds(250000UL);
 
-        tlx493d_init(&dut, sensorType);
+    tlx493d_init(&dut, sensorType);
 
-        digitalWrite(POWER_PIN, HIGH);
-        delayMicroseconds(0);
+    digitalWrite(POWER_PIN, HIGH);
+    delayMicroseconds(0);
 
-        ifx::tlx493d::initCommunication(&dut, Wire, TLx493D_IIC_ADDR_A0_e, true);
-        tlx493d_setDefaultConfig(&dut);
+    ifx::tlx493d::initCommunication(&dut, Wire, TLx493D_IIC_ADDR_A0_e, true);
+    tlx493d_setDefaultConfig(&dut);
 
-        Serial.println("\nAfter reset -------------------------------------------------------------------------------------------------------");
-        count = 0;
-    }
+    Serial.println("\nAfter reset "
+                   "-----------------------------------------------------------"
+                   "--------------------------------------------");
+    count = 0;
+  }
 }

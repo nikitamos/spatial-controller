@@ -88,25 +88,30 @@ TEST_IFX(TLx493D_P3B6_internal, checkResetValues)
 
 TEST_IFX(TLx493D_P3B6_internal, checkCalculateMagneticFieldAndTemperature)
 {
-    double temperature = 0.0;
-    dut.functions->calculateTemperature(&dut, &temperature);
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_3_TEMP_OFFSET / GEN_3_TEMP_SENSITIVITY + GEN_3_TEMP_REF, temperature );
+  real temperature = 0.0;
+  dut.functions->calculateTemperature(&dut, &temperature);
+  TEST_ASSERT_FLOAT_WITHIN(
+      1.0, -GEN_3_TEMP_OFFSET / GEN_3_TEMP_SENSITIVITY + GEN_3_TEMP_REF,
+      temperature);
 
-    double x = 0.0, y = 0.0, z = 0.0;
-    dut.functions->calculateMagneticField(&dut, &x, &y, &z);
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, x );
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, y );
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, z );
+  real x = 0.0, y = 0.0, z = 0.0;
+  dut.functions->calculateMagneticField(&dut, &x, &y, &z);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, x);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, y);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, z);
 
-    temperature = 0.0;
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
-    dut.functions->calculateMagneticFieldAndTemperature(&dut, &x, &y, &z, &temperature);
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_3_TEMP_OFFSET / GEN_3_TEMP_SENSITIVITY + GEN_3_TEMP_REF, temperature );
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, x );
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, y );
-    TEST_ASSERT_FLOAT_WITHIN( 2.0, 0.0, z );
+  temperature = 0.0;
+  x = 0.0;
+  y = 0.0;
+  z = 0.0;
+  dut.functions->calculateMagneticFieldAndTemperature(&dut, &x, &y, &z,
+                                                      &temperature);
+  TEST_ASSERT_FLOAT_WITHIN(
+      1.0, -GEN_3_TEMP_OFFSET / GEN_3_TEMP_SENSITIVITY + GEN_3_TEMP_REF,
+      temperature);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, x);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, y);
+  TEST_ASSERT_FLOAT_WITHIN(2.0, 0.0, z);
 }
 
 

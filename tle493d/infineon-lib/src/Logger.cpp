@@ -62,11 +62,7 @@ extern "C" {
         Serial.println();
     }
 
-
-    void logPrintDouble(double d) {
-        Serial.print(d);
-    }
-
+    void logPrintDouble(real d) { Serial.print(d); }
 
     void logPrint(const char *format, ...) {
         va_list ap;

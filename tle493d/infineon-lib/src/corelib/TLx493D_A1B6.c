@@ -233,41 +233,46 @@ bool TLx493D_A1B6_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *
     return tlx493d_common_getRawMagneticFieldAndTemperature(sensor, x, y, z, temperature);
 }
 
+void TLx493D_A1B6_calculateTemperature(TLx493D_t *sensor, real *temp) {
+  int16_t value = 0;
+  tlx493d_common_concatBytes(sensor, A1B6_TEMP_MSB_e, A1B6_TEMP_LSB_e, &value);
 
-void TLx493D_A1B6_calculateTemperature(TLx493D_t *sensor, double *temp) {
-    int16_t value = 0;
-    tlx493d_common_concatBytes(sensor, A1B6_TEMP_MSB_e, A1B6_TEMP_LSB_e, &value);
-    
-    *temp = (((double) value - GEN_1_TEMP_OFFSET) * GEN_1_TEMP_MULT) + GEN_1_REF_TEMP;
+  *temp =
+      (((real)value - GEN_1_TEMP_OFFSET) * GEN_1_TEMP_MULT) + GEN_1_REF_TEMP;
 }
 
-bool TLx493D_A1B6_getTemperature(TLx493D_t *sensor, double *temp) {
-    return tlx493d_common_getTemperature(sensor, temp);
+bool TLx493D_A1B6_getTemperature(TLx493D_t *sensor, real *temp) {
+  return tlx493d_common_getTemperature(sensor, temp);
 }
 
-void TLx493D_A1B6_calculateMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    int16_t valueX = 0, valueY = 0, valueZ = 0;
+void TLx493D_A1B6_calculateMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                         real *z) {
+  int16_t valueX = 0, valueY = 0, valueZ = 0;
 
-    tlx493d_common_concatBytes(sensor, A1B6_BX_MSB_e, A1B6_BX_LSB_e, &valueX);
-    tlx493d_common_concatBytes(sensor, A1B6_BY_MSB_e, A1B6_BY_LSB_e, &valueY);
-    tlx493d_common_concatBytes(sensor, A1B6_BZ_MSB_e, A1B6_BZ_LSB_e, &valueZ);
+  tlx493d_common_concatBytes(sensor, A1B6_BX_MSB_e, A1B6_BX_LSB_e, &valueX);
+  tlx493d_common_concatBytes(sensor, A1B6_BY_MSB_e, A1B6_BY_LSB_e, &valueY);
+  tlx493d_common_concatBytes(sensor, A1B6_BZ_MSB_e, A1B6_BZ_LSB_e, &valueZ);
 
-    *x = ((double) valueX) * GEN_1_MAG_FIELD_MULT;
-    *y = ((double) valueY) * GEN_1_MAG_FIELD_MULT;
-    *z = ((double) valueZ) * GEN_1_MAG_FIELD_MULT;
+  *x = ((real)valueX) * GEN_1_MAG_FIELD_MULT;
+  *y = ((real)valueY) * GEN_1_MAG_FIELD_MULT;
+  *z = ((real)valueZ) * GEN_1_MAG_FIELD_MULT;
 }
 
-bool TLx493D_A1B6_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    return tlx493d_common_getMagneticField(sensor, x, y, z);
+bool TLx493D_A1B6_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                   real *z) {
+  return tlx493d_common_getMagneticField(sensor, x, y, z);
 }
 
-void TLx493D_A1B6_calculateMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    TLx493D_A1B6_calculateMagneticField(sensor, x, y, z);
-    TLx493D_A1B6_calculateTemperature(sensor, temp);
+void TLx493D_A1B6_calculateMagneticFieldAndTemperature(TLx493D_t *sensor,
+                                                       real *x, real *y,
+                                                       real *z, real *temp) {
+  TLx493D_A1B6_calculateMagneticField(sensor, x, y, z);
+  TLx493D_A1B6_calculateTemperature(sensor, temp);
 }
 
-bool TLx493D_A1B6_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
+bool TLx493D_A1B6_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                 real *y, real *z, real *temp) {
+  return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
 }
 
 bool TLx493D_A1B6_setMeasurement(TLx493D_t *sensor, TLx493D_MeasurementType_t val) {
@@ -493,17 +498,19 @@ bool TLx493D_A1B6_setWakeUpThresholdsAsInteger(TLx493D_t *sensor, int16_t xlTh, 
     return false;
 }
 
-bool TLx493D_A1B6_setWakeUpThresholds(TLx493D_t *sensor, double temperature, double xLow, double xHigh, double yLow, double yHigh, double zLow, double zHigh) {
-    (void) temperature;
-    (void) xLow;
-    (void) xHigh;
-    (void) yLow;
-    (void) yHigh;
-    (void) zLow;
-    (void) zHigh;
+bool TLx493D_A1B6_setWakeUpThresholds(TLx493D_t *sensor, real temperature,
+                                      real xLow, real xHigh, real yLow,
+                                      real yHigh, real zLow, real zHigh) {
+  (void)temperature;
+  (void)xLow;
+  (void)xHigh;
+  (void)yLow;
+  (void)yHigh;
+  (void)zLow;
+  (void)zHigh;
 
-    tlx493d_warnFeatureNotAvailableForSensorType(sensor, "setWakeUpThresholds");
-    return false;
+  tlx493d_warnFeatureNotAvailableForSensorType(sensor, "setWakeUpThresholds");
+  return false;
 }
 
 bool TLx493D_A1B6_softwareReset(TLx493D_t *sensor) {
@@ -623,23 +630,23 @@ uint8_t TLx493D_A1B6_selectIICAddress(const TLx493D_t *sensor, TLx493D_IICAddres
     }
 }
 
-void TLx493D_A1B6_calculateRawMagneticFieldAtTemperature(const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                         double xInmT, double yInmT, double zInmT, int16_t *x, int16_t *y, int16_t *z) {
-    (void) sensor;
-    (void) rawTemp;
-    (void) sens;
+void TLx493D_A1B6_calculateRawMagneticFieldAtTemperature(
+    const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
+    real xInmT, real yInmT, real zInmT, int16_t *x, int16_t *y, int16_t *z) {
+  (void)sensor;
+  (void)rawTemp;
+  (void)sens;
 
-    *x = (int16_t) lround(xInmT / GEN_1_MAG_FIELD_MULT);
-    *y = (int16_t) lround(yInmT / GEN_1_MAG_FIELD_MULT);
-    *z = (int16_t) lround(zInmT / GEN_1_MAG_FIELD_MULT);
+  *x = (int16_t)lround(xInmT / GEN_1_MAG_FIELD_MULT);
+  *y = (int16_t)lround(yInmT / GEN_1_MAG_FIELD_MULT);
+  *z = (int16_t)lround(zInmT / GEN_1_MAG_FIELD_MULT);
 }
 
-
-double TLx493D_A1B6_getSensitivityScaleFactor(const TLx493D_t *sensor) {
-    tlx493d_warnFeatureNotAvailableForSensorType(sensor, "getSensitivityScaleFactor");
-    return 0.0;
+real TLx493D_A1B6_getSensitivityScaleFactor(const TLx493D_t *sensor) {
+  tlx493d_warnFeatureNotAvailableForSensorType(sensor,
+                                               "getSensitivityScaleFactor");
+  return 0.0;
 }
-
 
 bool TLx493D_A1B6_enableParityTest(TLx493D_t *sensor) {
     TLx493D_A1B6_setBitfield(sensor, A1B6_PT_e, TLx493D_A1B6_PARITY_TEST_ENABLE_default);

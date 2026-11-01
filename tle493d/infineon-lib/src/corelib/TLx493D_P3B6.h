@@ -33,14 +33,19 @@ bool TLx493D_P3B6_getRawMagneticField(TLx493D_t *sensor, int16_t *x, int16_t *y,
 void TLx493D_P3B6_calculateRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *x, int16_t *y, int16_t *z, int16_t *temperature);
 bool TLx493D_P3B6_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *x, int16_t *y, int16_t *z, int16_t *temperature);
 
-void TLx493D_P3B6_calculateTemperature(TLx493D_t *sensor, double *temp);
-bool TLx493D_P3B6_getTemperature(TLx493D_t *sensor, double *temp);
+void TLx493D_P3B6_calculateTemperature(TLx493D_t *sensor, real *temp);
+bool TLx493D_P3B6_getTemperature(TLx493D_t *sensor, real *temp);
 
-void TLx493D_P3B6_calculateMagneticField(TLx493D_t *sensor, double *x, double *y, double *z);
-bool TLx493D_P3B6_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z);
+void TLx493D_P3B6_calculateMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                         real *z);
+bool TLx493D_P3B6_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                   real *z);
 
-void TLx493D_P3B6_calculateMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp);
-bool TLx493D_P3B6_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp);
+void TLx493D_P3B6_calculateMagneticFieldAndTemperature(TLx493D_t *sensor,
+                                                       real *x, real *y,
+                                                       real *z, real *temp);
+bool TLx493D_P3B6_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                 real *y, real *z, real *temp);
 
 bool TLx493D_P3B6_setMeasurement(TLx493D_t *sensor, TLx493D_MeasurementType_t val);
 bool TLx493D_P3B6_setTrigger(TLx493D_t *sensor, TLx493D_TriggerType_t val);
@@ -67,7 +72,9 @@ bool TLx493D_P3B6_isWakeUpEnabled(const TLx493D_t *sensor);
 bool TLx493D_P3B6_enableWakeUpMode(TLx493D_t *sensor);
 bool TLx493D_P3B6_disableWakeUpMode(TLx493D_t *sensor);
 bool TLx493D_P3B6_setWakeUpThresholdsAsInteger(TLx493D_t *sensor, int16_t xlTh, int16_t xhTh, int16_t ylTh, int16_t yhTh, int16_t zlTh, int16_t zhTh);
-bool TLx493D_P3B6_setWakeUpThresholds(TLx493D_t *sensor, double temperature, double xLow, double xHigh, double yLow, double yHigh, double zLow, double zHigh);
+bool TLx493D_P3B6_setWakeUpThresholds(TLx493D_t *sensor, real temperature,
+                                      real xLow, real xHigh, real yLow,
+                                      real yHigh, real zLow, real zHigh);
 
 bool TLx493D_P3B6_softwareReset(TLx493D_t *sensor);
 
@@ -93,11 +100,11 @@ void TLx493D_P3B6_setResetValues(TLx493D_t *sensor);
 
 uint8_t TLx493D_P3B6_selectIICAddress(const TLx493D_t *sensor, TLx493D_IICAddressType_t addr);
 
-void TLx493D_P3B6_calculateRawMagneticFieldAtTemperature(const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                         double xInmT, double yInmT, double zInmT,
-                                                         int16_t *x, int16_t *y, int16_t *z);
+void TLx493D_P3B6_calculateRawMagneticFieldAtTemperature(
+    const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
+    real xInmT, real yInmT, real zInmT, int16_t *x, int16_t *y, int16_t *z);
 
-double TLx493D_P3B6_getSensitivityScaleFactor(const TLx493D_t *sensor);
+real TLx493D_P3B6_getSensitivityScaleFactor(const TLx493D_t *sensor);
 
 void TLx493D_P3B6_printRegisters(const TLx493D_t *sensor);
 

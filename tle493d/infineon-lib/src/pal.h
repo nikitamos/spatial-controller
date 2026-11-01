@@ -9,5 +9,10 @@ typedef struct TLx493D_SPIObject_t                 TLx493D_SPIObject_t;
 
 typedef struct TLx493D_Kit2GoBoardSupportObject_t  TLx493D_Kit2GoBoardSupportObject_t;
 
+#ifdef TLX493D_USE_DOUBLES
+typedef double real;
+#else
+typedef float real;
+#endif
 
 #endif // TLX493D_PAL_H

@@ -13,3 +13,7 @@ defmt = "1.1.1"
 bindgen = "=0.72.1"
 cc = "1.7.0"
 glob = "0.3.4"
+
+[features]
+default = []
+use-f64 = []

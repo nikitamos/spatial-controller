@@ -152,15 +152,19 @@ typedef bool (*TLx493D_GetRawMagneticFieldFuncPtr)(TLx493D_t *, int16_t *, int16
 typedef void (*TLx493D_CalculateRawMagneticFieldAndTemperatureFuncPtr)(TLx493D_t *, int16_t *, int16_t *, int16_t *, int16_t *);
 typedef bool (*TLx493D_GetRawMagneticFieldAndTemperatureFuncPtr)(TLx493D_t *, int16_t *, int16_t *, int16_t *, int16_t *);
 
-typedef void (*TLx493D_CalculateTemperatureFuncPtr)(TLx493D_t *, double *);
-typedef bool (*TLx493D_GetTemperatureFuncPtr)(TLx493D_t *, double *);
+typedef void (*TLx493D_CalculateTemperatureFuncPtr)(TLx493D_t *, real *);
+typedef bool (*TLx493D_GetTemperatureFuncPtr)(TLx493D_t *, real *);
 
-typedef void (*TLx493D_CalculateMagneticFieldFuncPtr)(TLx493D_t *, double *, double *, double *);
-typedef bool (*TLx493D_GetMagneticFieldFuncPtr)(TLx493D_t *, double *, double *, double *);
+typedef void (*TLx493D_CalculateMagneticFieldFuncPtr)(TLx493D_t *, real *,
+                                                      real *, real *);
+typedef bool (*TLx493D_GetMagneticFieldFuncPtr)(TLx493D_t *, real *, real *,
+                                                real *);
 
-typedef void (*TLx493D_CalculateMagneticFieldAndTemperatureFuncPtr)(TLx493D_t *, double *, double *, double *, double *);
-typedef bool (*TLx493D_GetMagneticFieldAndTemperatureFuncPtr)(TLx493D_t *, double *, double *, double *, double *);
-
+typedef void (*TLx493D_CalculateMagneticFieldAndTemperatureFuncPtr)(
+    TLx493D_t *, real *, real *, real *, real *);
+typedef bool (*TLx493D_GetMagneticFieldAndTemperatureFuncPtr)(TLx493D_t *,
+                                                              real *, real *,
+                                                              real *, real *);
 
 /** Following are the functions related to the "Config" register. */
 typedef bool (*TLx493D_SetMeasurementFuncPtr)(TLx493D_t *, TLx493D_MeasurementType_t);
@@ -193,7 +197,9 @@ typedef bool (*TLx493D_IsWakeUpEnabledFuncPtr)(const TLx493D_t *);
 typedef bool (*TLx493D_EnableWakeUpModeFuncPtr)(TLx493D_t *);
 typedef bool (*TLx493D_DisableWakeUpModeFuncPtr)(TLx493D_t *);
 typedef bool (*TLx493D_SetWakeUpThresholdsAsIntegerFuncPtr)(TLx493D_t *, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-typedef bool (*TLx493D_SetWakeUpThresholdsFuncPtr)(TLx493D_t *, double, double, double, double, double, double, double);
+typedef bool (*TLx493D_SetWakeUpThresholdsFuncPtr)(TLx493D_t *, real, real,
+                                                   real, real, real, real,
+                                                   real);
 
 typedef bool (*TLx493D_SoftwareResetFuncPtr)(TLx493D_t *);
 
@@ -213,11 +219,11 @@ typedef bool (*TLx493D_isInTestModeFuncPtr)(const TLx493D_t *);
 
 typedef void (*TLx493D_SetResetValuesFuncPtr)(TLx493D_t *);
 
-typedef void (*TLx493D_CalculateRawMagneticFieldAtTemperatureFuncPtr)(const TLx493D_t *, int16_t, TLx493D_SensitivityType_t,
-                                                                      double, double, double,
-                                                                      int16_t *, int16_t *, int16_t *);
+typedef void (*TLx493D_CalculateRawMagneticFieldAtTemperatureFuncPtr)(
+    const TLx493D_t *, int16_t, TLx493D_SensitivityType_t, real, real, real,
+    int16_t *, int16_t *, int16_t *);
 
-typedef double (*TLx493D_GetSensitivityScaleFactorFuncPtr)(const TLx493D_t *);
+typedef real (*TLx493D_GetSensitivityScaleFactorFuncPtr)(const TLx493D_t *);
 
 typedef uint8_t (*TLx493D_SelectIICAddressFuncPtr)(const TLx493D_t *, TLx493D_IICAddressType_t);
 

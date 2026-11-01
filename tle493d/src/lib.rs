@@ -19,12 +19,6 @@ impl BoolExt for bool {
     }
 }
 
-impl From<bool> for Result<(), Error> {
-    fn from(value: bool) -> Self {
-        value.ok_or(Error::Unknown)
-    }
-}
-
 use core::{
     arch::asm,
     ffi::{c_double, c_long},
@@ -79,8 +73,8 @@ pub struct Tlx493d<'m, I: I2c> {
     _p: PhantomData<&'m mut I>,
 }
 
-type MagneticField = [i16; 3];
-type Float = c_double;
+pub type MagneticField = [i16; 3];
+pub type Float = bindings::real;
 
 impl<'m, I: I2c> Tlx493d<'m, I> {
     pub fn new<S: types::SensorType>(

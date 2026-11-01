@@ -212,37 +212,39 @@ bool TLx493D_P3I8_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *
     return tlx493d_common_getRawMagneticFieldAndTemperature(sensor, x, y, z, temperature);
 }
 
-
-void TLx493D_P3I8_calculateTemperature(TLx493D_t *sensor, double *temp) {
-    tlx493d_gen_3_calculateTemperature(sensor, P3I8_TEMP_MSBS_e, P3I8_TEMP_LSBS_e, temp);
+void TLx493D_P3I8_calculateTemperature(TLx493D_t *sensor, real *temp) {
+  tlx493d_gen_3_calculateTemperature(sensor, P3I8_TEMP_MSBS_e, P3I8_TEMP_LSBS_e,
+                                     temp);
 }
 
-
-bool TLx493D_P3I8_getTemperature(TLx493D_t *sensor, double *temp) {
-    return tlx493d_common_getTemperature(sensor, temp);
+bool TLx493D_P3I8_getTemperature(TLx493D_t *sensor, real *temp) {
+  return tlx493d_common_getTemperature(sensor, temp);
 }
 
-
-void TLx493D_P3I8_calculateMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    tlx493d_gen_3_calculateMagneticField(sensor, P3I8_BX_MSBS_e, P3I8_BX_LSBS_e, P3I8_BY_MSBS_e, P3I8_BY_LSBS_e, P3I8_BZ_MSBS_e, P3I8_BZ_LSBS_e, P3I8_TEMP_MSBS_e, P3I8_TEMP_LSBS_e, x, y, z);
+void TLx493D_P3I8_calculateMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                         real *z) {
+  tlx493d_gen_3_calculateMagneticField(
+      sensor, P3I8_BX_MSBS_e, P3I8_BX_LSBS_e, P3I8_BY_MSBS_e, P3I8_BY_LSBS_e,
+      P3I8_BZ_MSBS_e, P3I8_BZ_LSBS_e, P3I8_TEMP_MSBS_e, P3I8_TEMP_LSBS_e, x, y,
+      z);
 }
 
-
-bool TLx493D_P3I8_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    return tlx493d_common_getMagneticField(sensor, x, y, z);
+bool TLx493D_P3I8_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                   real *z) {
+  return tlx493d_common_getMagneticField(sensor, x, y, z);
 }
 
-
-void TLx493D_P3I8_calculateMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    TLx493D_P3I8_calculateMagneticField(sensor, x, y, z);
-    TLx493D_P3I8_calculateTemperature(sensor, temp);
+void TLx493D_P3I8_calculateMagneticFieldAndTemperature(TLx493D_t *sensor,
+                                                       real *x, real *y,
+                                                       real *z, real *temp) {
+  TLx493D_P3I8_calculateMagneticField(sensor, x, y, z);
+  TLx493D_P3I8_calculateTemperature(sensor, temp);
 }
 
-
-bool TLx493D_P3I8_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
+bool TLx493D_P3I8_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                 real *y, real *z, real *temp) {
+  return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
 }
-
 
 bool TLx493D_P3I8_setMeasurement(TLx493D_t *sensor, TLx493D_MeasurementType_t val) {
     /** Bug fix : start reading at address 0x04 for Bz_Temp measurement, otherwise registers will be shifted by 4 ! */
@@ -374,16 +376,17 @@ bool TLx493D_P3I8_setWakeUpThresholdsAsInteger(TLx493D_t *sensor,
 
 
 /** thesholds im mT, to be converted to proper format. */
-bool TLx493D_P3I8_setWakeUpThresholds(TLx493D_t *sensor, double temperature,
-                                      double xLow, double xHigh, double yLow, double yHigh, double zLow, double zHigh) {
-    return tlx493d_gen_3_setWakeUpThresholds(sensor, P3I8_WU_EN_e, P3I8_WU_EN_CP_e, P3I8_WU_PAR_e,
-                                             P3I8_WU_XL_MSBS_e, P3I8_WU_XL_LSBS_e, P3I8_WU_XH_MSBS_e, P3I8_WU_XH_LSBS_e,
-                                             P3I8_WU_YL_MSBS_e, P3I8_WU_YL_LSBS_e, P3I8_WU_YH_MSBS_e, P3I8_WU_YH_LSBS_e,
-                                             P3I8_WU_ZL_MSBS_e, P3I8_WU_ZL_LSBS_e, P3I8_WU_ZH_MSBS_e, P3I8_WU_ZH_LSBS_e,
-                                             P3I8_SHORT_EN_e, P3I8_XTR_SHORT_EN_e,
-                                             temperature, xLow, xHigh, yLow, yHigh, zLow, zHigh);
+bool TLx493D_P3I8_setWakeUpThresholds(TLx493D_t *sensor, real temperature,
+                                      real xLow, real xHigh, real yLow,
+                                      real yHigh, real zLow, real zHigh) {
+  return tlx493d_gen_3_setWakeUpThresholds(
+      sensor, P3I8_WU_EN_e, P3I8_WU_EN_CP_e, P3I8_WU_PAR_e, P3I8_WU_XL_MSBS_e,
+      P3I8_WU_XL_LSBS_e, P3I8_WU_XH_MSBS_e, P3I8_WU_XH_LSBS_e,
+      P3I8_WU_YL_MSBS_e, P3I8_WU_YL_LSBS_e, P3I8_WU_YH_MSBS_e,
+      P3I8_WU_YH_LSBS_e, P3I8_WU_ZL_MSBS_e, P3I8_WU_ZL_LSBS_e,
+      P3I8_WU_ZH_MSBS_e, P3I8_WU_ZH_LSBS_e, P3I8_SHORT_EN_e,
+      P3I8_XTR_SHORT_EN_e, temperature, xLow, xHigh, yLow, yHigh, zLow, zHigh);
 }
-
 
 bool TLx493D_P3I8_softwareReset(TLx493D_t *sensor) {
     tlx493d_common_setBitfield(sensor, P3I8_RST_FLG_CLR_e, 1);
@@ -480,18 +483,17 @@ uint8_t TLx493D_P3I8_selectIICAddress(const TLx493D_t *sensor, TLx493D_IICAddres
     return 0;
 }
 
-
-void TLx493D_P3I8_calculateRawMagneticFieldAtTemperature(const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                         double xInmT, double yInmT, double zInmT,
-                                                         int16_t *x, int16_t *y, int16_t *z) {
-    tlx493d_gen_3_calculateRawMagneticFieldAtTemperature(sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
+void TLx493D_P3I8_calculateRawMagneticFieldAtTemperature(
+    const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
+    real xInmT, real yInmT, real zInmT, int16_t *x, int16_t *y, int16_t *z) {
+  tlx493d_gen_3_calculateRawMagneticFieldAtTemperature(
+      sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
 }
 
-
-double TLx493D_P3I8_getSensitivityScaleFactor(const TLx493D_t *sensor) {
-    return tlx493d_gen_3_getSensitivityScaleFactor(sensor, TLx493D_HAS_X4_e, P3I8_SHORT_EN_e, P3I8_XTR_SHORT_EN_e);
+real TLx493D_P3I8_getSensitivityScaleFactor(const TLx493D_t *sensor) {
+  return tlx493d_gen_3_getSensitivityScaleFactor(
+      sensor, TLx493D_HAS_X4_e, P3I8_SHORT_EN_e, P3I8_XTR_SHORT_EN_e);
 }
-
 
 void TLx493D_P3I8_printRegisters(const TLx493D_t *sensor) {
     logPrintRegisters(sensor, TLX493D_P3I8_REGISTER_HEADLINE); 

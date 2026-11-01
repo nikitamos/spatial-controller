@@ -115,11 +115,11 @@
  * the only option.
  **************************************************************************** */
 
- /* By default, Unity guesses that you will want single precision floating point
-  * support, but not double precision. It's easy to change either of these using
-  * the include and exclude options here. You may include neither, just float,
-  * or both, as suits your needs.
-  */
+/* By default, Unity guesses that you will want single precision floating point
+ * support, but not real precision. It's easy to change either of these using
+ * the include and exclude options here. You may include neither, just float,
+ * or both, as suits your needs.
+ */
 /* #define UNITY_EXCLUDE_FLOAT  */
 /* #define UNITY_INCLUDE_DOUBLE */
 /* #define UNITY_EXCLUDE_DOUBLE */
@@ -152,12 +152,12 @@
 /* If enabled, Unity assumes you want your `DOUBLE` asserts to compare standard
  * C doubles. If you would like to change this, you can specify something else
  * by using this option. For example, defining `UNITY_DOUBLE_TYPE` to `long
- * double` could enable gargantuan floating point types on your 64-bit processor
- * instead of the standard `double`.
+ * real` could enable gargantuan floating point types on your 64-bit processor
+ * instead of the standard `real`.
  *
  * Example:
  */
-/* #define UNITY_DOUBLE_TYPE long double */
+/* #define UNITY_DOUBLE_TYPE long real */
 
 /* If you look up `UNITY_ASSERT_EQUAL_FLOAT` and `UNITY_ASSERT_EQUAL_DOUBLE` as
  * documented in the Unity Assertion Guide, you will learn that they are not
@@ -166,7 +166,7 @@
  * configuration options. If you are working with 32-bit floats and/or 64-bit
  * doubles (the normal on most processors), you should have no need to change
  * these options. They are both set to give you approximately 1 significant bit
- * in either direction. The float precision is 0.00001 while the double is
+ * in either direction. The float precision is 0.00001 while the real is
  * 10^-12. For further details on how this works, see the appendix of the Unity
  * Assertion Guide.
  *
@@ -174,7 +174,6 @@
  */
 /* #define UNITY_FLOAT_PRECISION 0.001f  */
 /* #define UNITY_DOUBLE_PRECISION 0.001f */
-
 
 /* *************************** MISCELLANEOUS ***********************************
  * Miscellaneous configuration options for Unity

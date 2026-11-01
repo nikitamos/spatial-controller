@@ -45,20 +45,23 @@ TEST(TLx493D_A1B6_needsSensor, readRegisters)
 
 TEST(TLx493D_A1B6_needsSensor, getTemperature)
 {
-    double temperature = 0.0;
+  real temperature = 0.0;
 
-    TEST_ASSERT_EQUAL( true, dut.functions->getTemperature(&dut, &temperature));
-    TEST_ASSERT_FLOAT_WITHIN( 20.0, 25.0, temperature ); // Environmental temp is expected to be in range +5 to +45 deg C
+  TEST_ASSERT_EQUAL(true, dut.functions->getTemperature(&dut, &temperature));
+  TEST_ASSERT_FLOAT_WITHIN(20.0, 25.0,
+                           temperature); // Environmental temp is expected to be
+                                         // in range +5 to +45 deg C
 }
 
 TEST(TLx493D_A1B6_needsSensor, getMagneticField)
 {
-    double x = 0.0, y = 0.0, z = 0.0;
+  real x = 0.0, y = 0.0, z = 0.0;
 
-    TEST_ASSERT_EQUAL( true, dut.functions->getMagneticField(&dut, &x, &y, &z) );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, x ); // Residual mag field stays within 0-1 mT
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, y );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, z );
+  TEST_ASSERT_EQUAL(true, dut.functions->getMagneticField(&dut, &x, &y, &z));
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0,
+                           x); // Residual mag field stays within 0-1 mT
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, y);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, z);
 }
 
 /**
@@ -95,18 +98,18 @@ TEST(TLx493D_A1B6_TempDisable, TempDisable)
     // CH cannot be 0x03 when temperature measurement is disabled
     TEST_ASSERT_NOT_EQUAL ( 0x03, tlx493d_common_returnBitfield(&dut, A1B6_CH_e) );
 
-    double temperature = 0.0;
+    real temperature = 0.0;
     TEST_ASSERT_EQUAL( true, dut.functions->getTemperature(&dut, &temperature));
     
     // When temperature measurement is disabled in runtime, the last measured value remains in the register
     // sample 50 values of temperature after temp disable and check if they are equal to the value measured above.
-    double temp_sum = 0.0;
+    real temp_sum = 0.0;
 
     for(uint8_t i=0; i<50; i++)
     {
-        double temp_temp = 0.0;
-        dut.functions->getTemperature(&dut, &temp_temp);
-        temp_sum += temp_temp;
+      real temp_temp = 0.0;
+      dut.functions->getTemperature(&dut, &temp_temp);
+      temp_sum += temp_temp;
     }
 
     TEST_ASSERT_EQUAL_FLOAT(temp_sum/50, temperature);

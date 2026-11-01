@@ -51,33 +51,58 @@ void setup() {
  *  of all three sensors. After that they're all printed to the serial output.
  */
 void loop() {
-    double temp1 = 0.0, temp2 = 0.0, temp3 = 0.0;
-    double valX1 = 0, valY1 = 0, valZ1 = 0, valX2 = 0, valY2 = 0, valZ2 = 0, valX3 = 0, valY3 = 0, valZ3 = 0;
+  real temp1 = 0.0, temp2 = 0.0, temp3 = 0.0;
+  real valX1 = 0, valY1 = 0, valZ1 = 0, valX2 = 0, valY2 = 0, valZ2 = 0,
+       valX3 = 0, valY3 = 0, valZ3 = 0;
 
-    dut1.getTemperature(&temp1); 
-    dut2.getTemperature(&temp2); 
-    dut3.getTemperature(&temp3); 
+  dut1.getTemperature(&temp1);
+  dut2.getTemperature(&temp2);
+  dut3.getTemperature(&temp3);
 
-    dut1.getMagneticField(&valX1, &valY1, &valZ1);
-    dut2.getMagneticField(&valX2, &valY2, &valZ2);
-    dut3.getMagneticField(&valX3, &valY3, &valZ3);
+  dut1.getMagneticField(&valX1, &valY1, &valZ1);
+  dut2.getMagneticField(&valX2, &valY2, &valZ2);
+  dut3.getMagneticField(&valX3, &valY3, &valZ3);
 
-    Serial.println("========================================");
-    Serial.print("Temperature of Sensor 1:\t");Serial.print(temp1);Serial.println(" °C");
-    Serial.print("Magnetic X-Value of Sensor 1:\t");Serial.print(valX1);Serial.println(" mT");
-    Serial.print("Magnetic Y-Value of Sensor 1:\t");Serial.print(valY1);Serial.println(" mT");
-    Serial.print("Magnetic Z-Value of Sensor 1:\t");Serial.print(valZ1);Serial.println(" mT");
-    Serial.println("----------------------------------------");
-    Serial.print("Temperature of Sensor 2:\t");Serial.print(temp2);Serial.println(" °C");
-    Serial.print("Magnetic X-Value of Sensor 2:\t");Serial.print(valX2);Serial.println(" mT");
-    Serial.print("Magnetic Y-Value of Sensor 2:\t");Serial.print(valY2);Serial.println(" mT");
-    Serial.print("Magnetic Z-Value of Sensor 2:\t");Serial.print(valZ2);Serial.println(" mT");
-    Serial.println("----------------------------------------");
-    Serial.print("Temperature of Sensor 3:\t");Serial.print(temp3);Serial.println(" °C");
-    Serial.print("Magnetic X-Value of Sensor 3:\t");Serial.print(valX3);Serial.println(" mT");
-    Serial.print("Magnetic Y-Value of Sensor 3:\t");Serial.print(valY3);Serial.println(" mT");
-    Serial.print("Magnetic Z-Value of Sensor 3:\t");Serial.print(valZ3);Serial.println(" mT");
-    Serial.println("========================================\n\n");
-   
-    delay(2000);
+  Serial.println("========================================");
+  Serial.print("Temperature of Sensor 1:\t");
+  Serial.print(temp1);
+  Serial.println(" °C");
+  Serial.print("Magnetic X-Value of Sensor 1:\t");
+  Serial.print(valX1);
+  Serial.println(" mT");
+  Serial.print("Magnetic Y-Value of Sensor 1:\t");
+  Serial.print(valY1);
+  Serial.println(" mT");
+  Serial.print("Magnetic Z-Value of Sensor 1:\t");
+  Serial.print(valZ1);
+  Serial.println(" mT");
+  Serial.println("----------------------------------------");
+  Serial.print("Temperature of Sensor 2:\t");
+  Serial.print(temp2);
+  Serial.println(" °C");
+  Serial.print("Magnetic X-Value of Sensor 2:\t");
+  Serial.print(valX2);
+  Serial.println(" mT");
+  Serial.print("Magnetic Y-Value of Sensor 2:\t");
+  Serial.print(valY2);
+  Serial.println(" mT");
+  Serial.print("Magnetic Z-Value of Sensor 2:\t");
+  Serial.print(valZ2);
+  Serial.println(" mT");
+  Serial.println("----------------------------------------");
+  Serial.print("Temperature of Sensor 3:\t");
+  Serial.print(temp3);
+  Serial.println(" °C");
+  Serial.print("Magnetic X-Value of Sensor 3:\t");
+  Serial.print(valX3);
+  Serial.println(" mT");
+  Serial.print("Magnetic Y-Value of Sensor 3:\t");
+  Serial.print(valY3);
+  Serial.println(" mT");
+  Serial.print("Magnetic Z-Value of Sensor 3:\t");
+  Serial.print(valZ3);
+  Serial.println(" mT");
+  Serial.println("========================================\n\n");
+
+  delay(2000);
 }

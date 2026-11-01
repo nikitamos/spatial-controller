@@ -78,23 +78,31 @@ void setup() {
  */
 void loop() {
     if( intTriggered ) {
-        double temp1 = 0.0;
-        double valX1 = 0, valY1 = 0, valZ1 = 0;
+      real temp1 = 0.0;
+      real valX1 = 0, valY1 = 0, valZ1 = 0;
 
-        dut.printRegisters();
+      dut.printRegisters();
 
-        dut.getTemperature(&temp1); 
-        dut.getMagneticField(&valX1, &valY1, &valZ1);
-    
-        Serial.println("========================================");
-        Serial.print("Temperature of Sensor 1:\t");Serial.print(temp1);Serial.println(" °C");
-        Serial.print("Magnetic X-Value of Sensor 1:\t");Serial.print(valX1);Serial.println(" mT");
-        Serial.print("Magnetic Y-Value of Sensor 1:\t");Serial.print(valY1);Serial.println(" mT");
-        Serial.print("Magnetic Z-Value of Sensor 1:\t");Serial.print(valZ1);Serial.println(" mT");
+      dut.getTemperature(&temp1);
+      dut.getMagneticField(&valX1, &valY1, &valZ1);
 
-        delay(2000);
+      Serial.println("========================================");
+      Serial.print("Temperature of Sensor 1:\t");
+      Serial.print(temp1);
+      Serial.println(" °C");
+      Serial.print("Magnetic X-Value of Sensor 1:\t");
+      Serial.print(valX1);
+      Serial.println(" mT");
+      Serial.print("Magnetic Y-Value of Sensor 1:\t");
+      Serial.print(valY1);
+      Serial.println(" mT");
+      Serial.print("Magnetic Z-Value of Sensor 1:\t");
+      Serial.print(valZ1);
+      Serial.println(" mT");
 
-        intTriggered = false;
+      delay(2000);
+
+      intTriggered = false;
     }
 }
 

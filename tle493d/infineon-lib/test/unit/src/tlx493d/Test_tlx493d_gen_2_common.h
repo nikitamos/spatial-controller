@@ -28,14 +28,14 @@
 // {
 // }
 
-
 // TEST_IFX(SensorsGen2Common, checkCalculateMagneticFieldAndTemperature)
 // {
-//     // double temperature = 0.0;
+//     // real temperature = 0.0;
 //     // tlx493d_gen_2_calculateTemperature(&dut, &temperature);
-//     // TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_MULT + GEN_2_TEMP_REF, temperature );
+//     // TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_MULT +
+//     GEN_2_TEMP_REF, temperature );
 
-//     // double x = 0.0, y = 0.0, z = 0.0;
+//     // real x = 0.0, y = 0.0, z = 0.0;
 //     // tlx493d_gen_2_calculateMagneticField(&dut, &x, &y, &z);
 //     // TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, x );
 //     // TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, y );

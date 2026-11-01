@@ -53,29 +53,32 @@ void setup() {
  *  of the sensors. After that they're all printed to the serial output.
  */
 void loop() {
-    double temp = 0.0;
-    double valX = 0, valY = 0, valZ = 0;
+  real temp = 0.0;
+  real valX = 0, valY = 0, valZ = 0;
 
-    Serial.print(true == dut.getTemperature(&temp) ? "getTemperature ok\n" : "getTemperature error\n");
+  Serial.print(true == dut.getTemperature(&temp) ? "getTemperature ok\n"
+                                                 : "getTemperature error\n");
 
-    Serial.print("Temperature is: ");
-    Serial.print(temp);
-    Serial.println("°C");
+  Serial.print("Temperature is: ");
+  Serial.print(temp);
+  Serial.println("°C");
 
-    Serial.print(true == dut.getMagneticField(&valX, &valY, &valZ) ? "getMagneticField ok\n" : "getMagneticField error\n");
+  Serial.print(true == dut.getMagneticField(&valX, &valY, &valZ)
+                   ? "getMagneticField ok\n"
+                   : "getMagneticField error\n");
 
-    Serial.print("Value X is: ");
-    Serial.print(valX);
-    Serial.println(" mT");
-    Serial.print("Value Y is: ");
-    Serial.print(valY);
-    Serial.println(" mT");
-    Serial.print("Value Z is: ");
-    Serial.print(valZ);
-    Serial.println(" mT");
+  Serial.print("Value X is: ");
+  Serial.print(valX);
+  Serial.println(" mT");
+  Serial.print("Value Y is: ");
+  Serial.print(valY);
+  Serial.println(" mT");
+  Serial.print("Value Z is: ");
+  Serial.print(valZ);
+  Serial.println(" mT");
 
-    dut.printRegisters();
-    Serial.print("\n");
+  dut.printRegisters();
+  Serial.print("\n");
 
-    delay(1000);
+  delay(1000);
 }

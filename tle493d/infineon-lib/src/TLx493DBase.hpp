@@ -101,18 +101,22 @@ namespace ifx {
                 }
 
                 /**
-                 * @brief The function `getTemperature` retrieves the temperature from a TLx493D sensor in °C.
-                 * It is reading out the temperature registers of the sensor and converts the values into °C with the formula
-                 * that is provided in the datasheet of the sensor.
-                 * 
-                 * @param[in,out] temperature A pointer to a double variable where the temperature value will be stored in °C.
-                 *  
-                 * @return The function `getTemperature` is returning a boolean value.
+                 * @brief The function `getTemperature` retrieves the
+                 * temperature from a TLx493D sensor in °C. It is reading out
+                 * the temperature registers of the sensor and converts the
+                 * values into °C with the formula that is provided in the
+                 * datasheet of the sensor.
+                 *
+                 * @param[in,out] temperature A pointer to a real variable where
+                 * the temperature value will be stored in °C.
+                 *
+                 * @return The function `getTemperature` is returning a boolean
+                 * value.
                  * @retval false Error.
-                 * @retval true Function execution was successful. 
+                 * @retval true Function execution was successful.
                  */
-                bool getTemperature(double *temperature) {
-                    return ::tlx493d_getTemperature(&sensor, temperature);
+                bool getTemperature(real *temperature) {
+                  return ::tlx493d_getTemperature(&sensor, temperature);
                 }
 
                 /**
@@ -128,29 +132,38 @@ namespace ifx {
                  * @retval false Error.
                  * @retval true Function execution was successful. 
                  */
-                bool getMagneticField(double *x, double *y, double *z) {
-                    return ::tlx493d_getMagneticField(&sensor, x, y, z);
+                bool getMagneticField(real *x, real *y, real *z) {
+                  return ::tlx493d_getMagneticField(&sensor, x, y, z);
                 }
 
                 /**
-                 * @brief The function `getMagneticFieldAndTemperature` retrieves the magnetic field and temperature
-                 * readings from a TLx493D sensor.
-                 * It combines the two functions `getMagneticFieldAndTemperature` and `tlx493d_getMagneticField` in order to have one
-                 * function which is providing the temperature as well as the magnetic field values of the sensor.
-                 * 
-                 * @param[in,out] x     A pointer to a variable where the magnetic field value in mT along the x-axis will be stored.
-                 * @param[in,out] y     A pointer to a variable where the magnetic field value in mT along the y-axis will be stored.
-                 * @param[in,out] z     A pointer to a variable where the magnetic field value in mT along the z-axis will be stored.
-                 * @param[in,out] temp  A pointer to a double variable where the temperature value in °C will be stored.
-                 *  
-                 * @return The function `getMagneticFieldAndTemperature` is returning a boolean value.
+                 * @brief The function `getMagneticFieldAndTemperature`
+                 * retrieves the magnetic field and temperature readings from a
+                 * TLx493D sensor. It combines the two functions
+                 * `getMagneticFieldAndTemperature` and
+                 * `tlx493d_getMagneticField` in order to have one function
+                 * which is providing the temperature as well as the magnetic
+                 * field values of the sensor.
+                 *
+                 * @param[in,out] x     A pointer to a variable where the
+                 * magnetic field value in mT along the x-axis will be stored.
+                 * @param[in,out] y     A pointer to a variable where the
+                 * magnetic field value in mT along the y-axis will be stored.
+                 * @param[in,out] z     A pointer to a variable where the
+                 * magnetic field value in mT along the z-axis will be stored.
+                 * @param[in,out] temp  A pointer to a real variable where the
+                 * temperature value in °C will be stored.
+                 *
+                 * @return The function `getMagneticFieldAndTemperature` is
+                 * returning a boolean value.
                  * @retval false Error.
-                 * @retval true Function execution was successful. 
+                 * @retval true Function execution was successful.
                  */
-                bool getMagneticFieldAndTemperature(double *x, double *y, double *z, double *temp) {
-                    return ::tlx493d_getMagneticFieldAndTemperature(&sensor, x, y, z, temp);
+                bool getMagneticFieldAndTemperature(real *x, real *y, real *z,
+                                                    real *temp) {
+                  return ::tlx493d_getMagneticFieldAndTemperature(&sensor, x, y,
+                                                                  z, temp);
                 }
-
 
                 // functions related to the "Config" register
                 /**
@@ -429,8 +442,12 @@ namespace ifx {
                  * @retval false Error.
                  * @retval true Function execution was successful. 
                  */
-                bool setWakeUpThresholds(double temperature, double xl_th, double xh_th, double yl_th, double yh_th, double zl_th, double zh_th) {
-                    return ::tlx493d_setWakeUpThresholds(&sensor, temperature, xl_th, xh_th, yl_th, yh_th, zl_th, zh_th);
+                bool setWakeUpThresholds(real temperature, real xl_th,
+                                         real xh_th, real yl_th, real yh_th,
+                                         real zl_th, real zh_th) {
+                  return ::tlx493d_setWakeUpThresholds(&sensor, temperature,
+                                                       xl_th, xh_th, yl_th,
+                                                       yh_th, zl_th, zh_th);
                 }
 
                 /**
@@ -476,12 +493,13 @@ namespace ifx {
                  * @param[in,out]   z           A pointer to a variable where the calculated raw magnetic field in the z-axis will be
                  * stored.
                  */
-                void calculateRawMagneticFieldAtTemperature(int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                            double xInmT, double yInmT, double zInmT,
-                                                            int16_t *x, int16_t *y, int16_t *z) {
-                    ::tlx493d_calculateRawMagneticFieldAtTemperature(&sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
+                void calculateRawMagneticFieldAtTemperature(
+                    int16_t rawTemp, TLx493D_SensitivityType_t sens, real xInmT,
+                    real yInmT, real zInmT, int16_t *x, int16_t *y,
+                    int16_t *z) {
+                  ::tlx493d_calculateRawMagneticFieldAtTemperature(
+                      &sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
                 }
-
 
                 /**
                  * @brief The function `printRegisters` prints out the internal registers of the sensor object. It can be used

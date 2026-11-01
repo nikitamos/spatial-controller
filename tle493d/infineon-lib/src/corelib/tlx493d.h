@@ -103,20 +103,22 @@ bool tlx493d_getRawMagneticField(TLx493D_t *sensor, int16_t *x, int16_t *y, int1
  */
 bool tlx493d_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *x, int16_t *y, int16_t *z, int16_t *temperature);
 
-
 /**
- * @brief The function `tlx493d_getTemperature` retrieves the temperature from a TLx493D sensor in °C.
- * It is reading out the temperature registers of the sensor and converts the values into °C with the formula
- * that is provided in the datasheet of the sensor.
- * 
- * @param[in,out] sensor        A pointer to a TLx493D_t struct, which represents the TLx493D sensor.
- * @param[in,out] temperature   A pointer to a double variable where the temperature value will be stored in °C.
- * 
+ * @brief The function `tlx493d_getTemperature` retrieves the temperature from a
+ * TLx493D sensor in °C. It is reading out the temperature registers of the
+ * sensor and converts the values into °C with the formula that is provided in
+ * the datasheet of the sensor.
+ *
+ * @param[in,out] sensor        A pointer to a TLx493D_t struct, which
+ * represents the TLx493D sensor.
+ * @param[in,out] temperature   A pointer to a real variable where the
+ * temperature value will be stored in °C.
+ *
  * @return The function `tlx493d_getTemperature` is returning a boolean value.
  * @retval false Error.
  * @retval true Function execution was successful.
  */
-bool tlx493d_getTemperature(TLx493D_t *sensor, double *temperature);
+bool tlx493d_getTemperature(TLx493D_t *sensor, real *temperature);
 
 /**
  * @brief The function `tlx493d_getMagneticField` retrieves the magnetic field values from a TLx493D sensor.
@@ -132,26 +134,33 @@ bool tlx493d_getTemperature(TLx493D_t *sensor, double *temperature);
  * @retval false Error.
  * @retval true Function execution was successful.
  */
-bool tlx493d_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z);
+bool tlx493d_getMagneticField(TLx493D_t *sensor, real *x, real *y, real *z);
 
 /**
- * @brief The function `tlx493d_getMagneticFieldAndTemperature` retrieves the magnetic field and temperature
- * readings from a TLx493D sensor.
- * It combines the two functions `tlx493d_getTemperature` and `tlx493d_getMagneticField` in order to have one
- * function which is providing the temperature as well as the magnetic field values of the sensor.
- * 
- * @param[in,out] sensor        A pointer to the TLx493D_t structure that represents the sensor.
- * @param[in,out] x             A pointer to a variable where the magnetic field value in mT along the x-axis will be stored.
- * @param[in,out] y             A pointer to a variable where the magnetic field value in mT along the y-axis will be stored.
- * @param[in,out] z             A pointer to a variable where the magnetic field value in mT along the z-axis will be stored.
- * @param[in,out] temperature   A pointer to a double variable where the temperature value in °C will be stored.
- * 
- * @return The function `tlx493d_getMagneticFieldAndTemperature` is returning a boolean value.
+ * @brief The function `tlx493d_getMagneticFieldAndTemperature` retrieves the
+ * magnetic field and temperature readings from a TLx493D sensor. It combines
+ * the two functions `tlx493d_getTemperature` and `tlx493d_getMagneticField` in
+ * order to have one function which is providing the temperature as well as the
+ * magnetic field values of the sensor.
+ *
+ * @param[in,out] sensor        A pointer to the TLx493D_t structure that
+ * represents the sensor.
+ * @param[in,out] x             A pointer to a variable where the magnetic field
+ * value in mT along the x-axis will be stored.
+ * @param[in,out] y             A pointer to a variable where the magnetic field
+ * value in mT along the y-axis will be stored.
+ * @param[in,out] z             A pointer to a variable where the magnetic field
+ * value in mT along the z-axis will be stored.
+ * @param[in,out] temperature   A pointer to a real variable where the
+ * temperature value in °C will be stored.
+ *
+ * @return The function `tlx493d_getMagneticFieldAndTemperature` is returning a
+ * boolean value.
  * @retval false Error.
  * @retval true Function execution was successful.
  */
-bool tlx493d_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temperature);
-
+bool tlx493d_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x, real *y,
+                                            real *z, real *temperature);
 
 /** functions related to the "Config" register. */
 /**
@@ -407,26 +416,37 @@ bool tlx493d_setWakeUpThresholdsAsInteger(TLx493D_t *sensor, int16_t xl_th, int1
                                           int16_t zl_th, int16_t zh_th);
 
 /**
- * @brief The function `tlx493d_setWakeUpThresholds` sets the wake-up thresholds for the TLx493D sensor in mT.
- * It sets the lower and upper threshold for each of three axis in mT. If one of these thresholds is exceeded the sensor
- * will trigger an interrupt. It will continue to trigger interrupts as long as the threshold is exceeded.
- * 
- * @param[in,out]   sensor       A pointer to the TLx493D_t structure, which represents the sensor device.
- * @param[in]       temperature  The temperature to be used for derating the field values.
- * @param[in]       xLow         The lower threshold value for the magnetic field in x-axis.
- * @param[in]       xHigh        The upper threshold value for the magnetic field in x-axis.
- * @param[in]       yLow         The lower threshold value for the magnetic field in y-axis.
- * @param[in]       yHigh        The upper threshold value for the magnetic field in y-axis.
- * @param[in]       zLow         The lower threshold value for the magnetic field in z-axis.
- * @param[in]       zHigh        The upper threshold value for the magnetic field in z-axis.
- * 
- * @return The function `tlx493d_setWakeUpThresholds` is returning a boolean value.
+ * @brief The function `tlx493d_setWakeUpThresholds` sets the wake-up thresholds
+ * for the TLx493D sensor in mT. It sets the lower and upper threshold for each
+ * of three axis in mT. If one of these thresholds is exceeded the sensor will
+ * trigger an interrupt. It will continue to trigger interrupts as long as the
+ * threshold is exceeded.
+ *
+ * @param[in,out]   sensor       A pointer to the TLx493D_t structure, which
+ * represents the sensor device.
+ * @param[in]       temperature  The temperature to be used for derating the
+ * field values.
+ * @param[in]       xLow         The lower threshold value for the magnetic
+ * field in x-axis.
+ * @param[in]       xHigh        The upper threshold value for the magnetic
+ * field in x-axis.
+ * @param[in]       yLow         The lower threshold value for the magnetic
+ * field in y-axis.
+ * @param[in]       yHigh        The upper threshold value for the magnetic
+ * field in y-axis.
+ * @param[in]       zLow         The lower threshold value for the magnetic
+ * field in z-axis.
+ * @param[in]       zHigh        The upper threshold value for the magnetic
+ * field in z-axis.
+ *
+ * @return The function `tlx493d_setWakeUpThresholds` is returning a boolean
+ * value.
  * @retval false Error.
  * @retval true Function execution was successful.
- */                                       
-bool tlx493d_setWakeUpThresholds(TLx493D_t *sensor, double temperature,
-                                 double xLow, double xHigh, double yLow, double yHigh, double zLow, double zHigh);
-
+ */
+bool tlx493d_setWakeUpThresholds(TLx493D_t *sensor, real temperature, real xLow,
+                                 real xHigh, real yLow, real yHigh, real zLow,
+                                 real zHigh);
 
 /** utilities. */
 /**
@@ -471,10 +491,9 @@ const char *tlx493d_getTypeAsString(const TLx493D_t *sensor);
  * @param[in,out]   z           A pointer to a variable where the calculated raw magnetic field in the z-axis will be
  * stored.
  */
-void tlx493d_calculateRawMagneticFieldAtTemperature(TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                    double xInmT, double yInmT, double zInmT,
-                                                    int16_t *x, int16_t *y, int16_t *z);
-
+void tlx493d_calculateRawMagneticFieldAtTemperature(
+    TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
+    real xInmT, real yInmT, real zInmT, int16_t *x, int16_t *y, int16_t *z);
 
 /**
  * @brief The function `tlx493d_printRegisters` prints out the internal registers of the sensor object. It can be used

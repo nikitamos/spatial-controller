@@ -38,54 +38,64 @@ void setup() {
  *  We're also reading out the raw temperature value (in LSB).
  */
 void loop() {
-    double temp = 0.0;
-    double valX = 0, valY = 0, valZ = 0;
-    int16_t tempRaw = 0;
+  real temp = 0.0;
+  real valX = 0, valY = 0, valZ = 0;
+  int16_t tempRaw = 0;
 
-    dut.printRegisters();
-    Serial.print("\n");
+  dut.printRegisters();
+  Serial.print("\n");
 
-    /** Note that you don't have to toggle any chip select signal, this is done in the background within the transfer function. */
-    Serial.print(true == dut.getTemperature(&temp) ? "getTemperature ok\n" : "getTemperature error\n");
+  /** Note that you don't have to toggle any chip select signal, this is done in
+   * the background within the transfer function. */
+  Serial.print(true == dut.getTemperature(&temp) ? "getTemperature ok\n"
+                                                 : "getTemperature error\n");
 
-    Serial.print("Temperature is: ");
-    Serial.print(temp);
-    Serial.println(" °C");
+  Serial.print("Temperature is: ");
+  Serial.print(temp);
+  Serial.println(" °C");
 
-    dut.getRawTemperature(&tempRaw);
+  dut.getRawTemperature(&tempRaw);
 
-    Serial.print("Raw temperature is: ");
-    Serial.print(tempRaw);
-    Serial.println(" LSB");
+  Serial.print("Raw temperature is: ");
+  Serial.print(tempRaw);
+  Serial.println(" LSB");
 
-    Serial.print(true == dut.getMagneticFieldAndTemperature(&valX, &valY, &valZ, &temp) ? "getMagneticFieldAndTemperature ok\n" : "getMagneticFieldAndTemperature error\n");
+  Serial.print(
+      true == dut.getMagneticFieldAndTemperature(&valX, &valY, &valZ, &temp)
+          ? "getMagneticFieldAndTemperature ok\n"
+          : "getMagneticFieldAndTemperature error\n");
 
-    Serial.print("Value X is: ");
-    Serial.print(valX);
-    Serial.println(" mT");
-    Serial.print("Value Y is: ");
-    Serial.print(valY);
-    Serial.println(" mT");
-    Serial.print("Value Z is: ");
-    Serial.print(valZ);
-    Serial.println(" mT");
+  Serial.print("Value X is: ");
+  Serial.print(valX);
+  Serial.println(" mT");
+  Serial.print("Value Y is: ");
+  Serial.print(valY);
+  Serial.println(" mT");
+  Serial.print("Value Z is: ");
+  Serial.print(valZ);
+  Serial.println(" mT");
 
-    dut.printRegisters();
-    Serial.print("\n");
+  dut.printRegisters();
+  Serial.print("\n");
 
-    delay(1000);
+  delay(1000);
 
-    Serial.print("count : ");
-    Serial.println(count);
+  Serial.print("count : ");
+  Serial.println(count);
 
-    if( ++count == 10 ) {
-        Serial.println("Before reset -------------------------------------------------------------------------------------------------------");
+  if (++count == 10) {
+    Serial.println("Before reset "
+                   "-----------------------------------------------------------"
+                   "--------------------------------------------");
 
-        /* Use reset to do a full power down reset or softwareReset to reset using register settings. **/
-        dut.reset();
-        // dut.softwareReset();
+    /* Use reset to do a full power down reset or softwareReset to reset using
+     * register settings. **/
+    dut.reset();
+    // dut.softwareReset();
 
-        Serial.println("After reset -------------------------------------------------------------------------------------------------------");
-        count = 0;
-    }
+    Serial.println("After reset "
+                   "-----------------------------------------------------------"
+                   "--------------------------------------------");
+    count = 0;
+  }
 }

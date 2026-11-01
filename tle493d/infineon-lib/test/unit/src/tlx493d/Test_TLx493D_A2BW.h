@@ -45,20 +45,20 @@ static TEST_TEAR_DOWN(TLx493D_A2BW_internal)
 
 TEST_IFX(TLx493D_A2BW_internal, checkUnsupportedFunctionality)
 {
-    static double  xl, xh, yl, yh, zl, zh, t;
-    static int16_t xl_i, xh_i, yl_i, yh_i, zl_i, zh_i;
+  static real xl, xh, yl, yh, zl, zh, t;
+  static int16_t xl_i, xh_i, yl_i, yh_i, zl_i, zh_i;
 
+  TEST_ASSERT_FALSE(dut.functions->hasWakeUp(&dut));
+  TEST_ASSERT_FALSE(dut.functions->isWakeUpEnabled(&dut));
+  TEST_ASSERT_FALSE(dut.functions->enableWakeUpMode(&dut));
+  TEST_ASSERT_FALSE(dut.functions->disableWakeUpMode(&dut));
 
-    TEST_ASSERT_FALSE( dut.functions->hasWakeUp(&dut) );
-    TEST_ASSERT_FALSE( dut.functions->isWakeUpEnabled(&dut) );
-    TEST_ASSERT_FALSE( dut.functions->enableWakeUpMode(&dut) );
-    TEST_ASSERT_FALSE( dut.functions->disableWakeUpMode(&dut) );
+  TEST_ASSERT_FALSE(dut.functions->setWakeUpThresholdsAsInteger(
+      &dut, xh_i, xl_i, yh_i, yl_i, zh_i, zl_i));
+  TEST_ASSERT_FALSE(
+      dut.functions->setWakeUpThresholds(&dut, t, xh, xl, yh, yl, zh, zl));
 
-    TEST_ASSERT_FALSE( dut.functions->setWakeUpThresholdsAsInteger(&dut, xh_i, xl_i, yh_i, yl_i, zh_i, zl_i) );
-    TEST_ASSERT_FALSE( dut.functions->setWakeUpThresholds(&dut, t, xh, xl, yh, yl, zh, zl) );
-
-
-    TEST_ASSERT_FALSE( dut.functions->softwareReset(&dut) );
+  TEST_ASSERT_FALSE(dut.functions->softwareReset(&dut));
 }
 
 
@@ -92,25 +92,30 @@ TEST_IFX(TLx493D_A2BW_internal, checkResetValues)
 
 TEST_IFX(TLx493D_A2BW_internal, checkCalculateMagneticFieldAndTemperature)
 {
-    double temperature = 0.0;
-    dut.functions->calculateTemperature(&dut, &temperature);
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_RESOLUTION + GEN_2_TEMP_REF, temperature );
+  real temperature = 0.0;
+  dut.functions->calculateTemperature(&dut, &temperature);
+  TEST_ASSERT_FLOAT_WITHIN(
+      1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_RESOLUTION + GEN_2_TEMP_REF,
+      temperature);
 
-    double x = 0.0, y = 0.0, z = 0.0;
-    dut.functions->calculateMagneticField(&dut, &x, &y, &z);
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, x );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, y );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, z );
+  real x = 0.0, y = 0.0, z = 0.0;
+  dut.functions->calculateMagneticField(&dut, &x, &y, &z);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, x);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, y);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, z);
 
-    temperature = 0.0;
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
-    dut.functions->calculateMagneticFieldAndTemperature(&dut, &x, &y, &z, &temperature);
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_RESOLUTION + GEN_2_TEMP_REF, temperature );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, x );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, y );
-    TEST_ASSERT_FLOAT_WITHIN( 1.0, 0.0, z );
+  temperature = 0.0;
+  x = 0.0;
+  y = 0.0;
+  z = 0.0;
+  dut.functions->calculateMagneticFieldAndTemperature(&dut, &x, &y, &z,
+                                                      &temperature);
+  TEST_ASSERT_FLOAT_WITHIN(
+      1.0, -GEN_2_TEMP_OFFSET * GEN_2_TEMP_RESOLUTION + GEN_2_TEMP_REF,
+      temperature);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, x);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, y);
+  TEST_ASSERT_FLOAT_WITHIN(1.0, 0.0, z);
 }
 
 

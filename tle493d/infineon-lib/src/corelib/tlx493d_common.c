@@ -209,41 +209,42 @@ bool tlx493d_common_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t
 /***
  * 
 */
-bool tlx493d_common_getTemperature(TLx493D_t *sensor, double *temperature) {
-    if( sensor->functions->readRegistersAndCheck(sensor) ) {
-        sensor->functions->calculateTemperature(sensor, temperature);
-        return true;
-    }
+bool tlx493d_common_getTemperature(TLx493D_t *sensor, real *temperature) {
+  if (sensor->functions->readRegistersAndCheck(sensor)) {
+    sensor->functions->calculateTemperature(sensor, temperature);
+    return true;
+  }
 
-    return false;
+  return false;
 }
-
 
 /***
  * 
 */
-bool tlx493d_common_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z ) {
-    if( sensor->functions->readRegistersAndCheck(sensor) ) {
-        sensor->functions->calculateMagneticField(sensor, x, y, z);
-        return true;
-    }
+bool tlx493d_common_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                     real *z) {
+  if (sensor->functions->readRegistersAndCheck(sensor)) {
+    sensor->functions->calculateMagneticField(sensor, x, y, z);
+    return true;
+  }
 
-    return false;
+  return false;
 }
-
 
 /***
  * 
 */
-bool tlx493d_common_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temperature) {
-    if( sensor->functions->readRegistersAndCheck(sensor) ) {
-        sensor->functions->calculateMagneticFieldAndTemperature(sensor, x, y, z, temperature);
-        return true;
-    }
+bool tlx493d_common_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                   real *y, real *z,
+                                                   real *temperature) {
+  if (sensor->functions->readRegistersAndCheck(sensor)) {
+    sensor->functions->calculateMagneticFieldAndTemperature(sensor, x, y, z,
+                                                            temperature);
+    return true;
+  }
 
-    return false;
+  return false;
 }
-
 
 uint8_t tlx493d_common_returnBitfield(const TLx493D_t *sensor, uint8_t bitField) {
     const TLx493D_Register_t *bf = &sensor->regDef[bitField];

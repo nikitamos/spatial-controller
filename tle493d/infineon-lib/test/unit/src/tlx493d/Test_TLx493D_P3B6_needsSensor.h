@@ -73,99 +73,105 @@ TEST_IFX(TLx493D_P3B6_needsSensorInternal, checkSupportedFunctionality)
 
 TEST_IFX(TLx493D_P3B6_needsSensorInternal, checkGetMagneticFieldAndTemperature)
 {
-    double xfr, yfr, zfr, tfr, tfr0;
+  real xfr, yfr, zfr, tfr, tfr0;
 
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->getTemperature(&dut, &tfr0) );
-    TEST_ASSERT_FLOAT_WITHIN( 20.0, 25.0, tfr0 );
-    // tlx493d_printRegisters(&dut);
+  TEST_ASSERT_TRUE(dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->getTemperature(&dut, &tfr0));
+  TEST_ASSERT_FLOAT_WITHIN(20.0, 25.0, tfr0);
+  // tlx493d_printRegisters(&dut);
 
-    dut.functions->calculateMagneticField(&dut, &xfr, &yfr, &zfr);
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, xfr );
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, yfr );
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, zfr );
+  dut.functions->calculateMagneticField(&dut, &xfr, &yfr, &zfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, xfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, yfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, zfr);
 
-    dut.functions->calculateMagneticFieldAndTemperature(&dut, &xfr, &yfr, &zfr, &tfr);
-    TEST_ASSERT_EQUAL_FLOAT( tfr, tfr0 );
-    TEST_ASSERT_FLOAT_WITHIN( 20.0, 25.0, tfr );
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, xfr );
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, yfr );
-    TEST_ASSERT_FLOAT_WITHIN( 100.0, 0.0, zfr );
+  dut.functions->calculateMagneticFieldAndTemperature(&dut, &xfr, &yfr, &zfr,
+                                                      &tfr);
+  TEST_ASSERT_EQUAL_FLOAT(tfr, tfr0);
+  TEST_ASSERT_FLOAT_WITHIN(20.0, 25.0, tfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, xfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, yfr);
+  TEST_ASSERT_FLOAT_WITHIN(100.0, 0.0, zfr);
 
+  // TLx493D_FULL_RANGE_e
+  int16_t xfrr, yfrr, zfrr, tfrr;
+  dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xfrr, &yfrr,
+                                                         &zfrr, &tfrr);
 
-    // TLx493D_FULL_RANGE_e
-    int16_t xfrr, yfrr, zfrr, tfrr;
-    dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xfrr, &yfrr, &zfrr, &tfrr);
+  int16_t xfrr2, yfrr2, zfrr2, tfrr2;
+  tlx493d_gen_3_convertTemperatureToRaw(&dut, tfr0, &tfrr2);
+  dut.functions->calculateRawMagneticFieldAtTemperature(
+      &dut, tfrr, TLx493D_FULL_RANGE_e, xfr, yfr, zfr, &xfrr2, &yfrr2, &zfrr2);
 
-    int16_t xfrr2, yfrr2, zfrr2, tfrr2;
-    tlx493d_gen_3_convertTemperatureToRaw(&dut, tfr0, &tfrr2);
-    dut.functions->calculateRawMagneticFieldAtTemperature(&dut, tfrr, TLx493D_FULL_RANGE_e, xfr, yfr, zfr, &xfrr2, &yfrr2, &zfrr2);
+  TEST_ASSERT_EQUAL_INT16(tfrr, tfrr2);
+  TEST_ASSERT_EQUAL_INT16(xfrr, xfrr2);
+  TEST_ASSERT_EQUAL_INT16(yfrr, yfrr2);
+  TEST_ASSERT_EQUAL_INT16(zfrr, zfrr2);
 
-    TEST_ASSERT_EQUAL_INT16( tfrr, tfrr2 );
-    TEST_ASSERT_EQUAL_INT16( xfrr, xfrr2 );
-    TEST_ASSERT_EQUAL_INT16( yfrr, yfrr2 );
-    TEST_ASSERT_EQUAL_INT16( zfrr, zfrr2 );
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  // TLx493D_SHORT_RANGE_e
+  real xsr, ysr, zsr, tsr, tsr0;
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // TLx493D_SHORT_RANGE_e
-    double xsr, ysr, zsr, tsr, tsr0;
+  TEST_ASSERT_TRUE(dut.functions->setSensitivity(&dut, TLx493D_SHORT_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->getTemperature(&dut, &tsr0));
+  // tlx493d_printRegisters(&dut);
 
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_SHORT_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->getTemperature(&dut, &tsr0) );
-    // tlx493d_printRegisters(&dut);
+  int16_t xsrr, ysrr, zsrr, tsrr;
+  dut.functions->calculateMagneticFieldAndTemperature(&dut, &xsr, &ysr, &zsr,
+                                                      &tsr);
+  dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xsrr, &ysrr,
+                                                         &zsrr, &tsrr);
 
-    int16_t xsrr, ysrr, zsrr, tsrr;
-    dut.functions->calculateMagneticFieldAndTemperature(&dut, &xsr, &ysr, &zsr, &tsr);
-    dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xsrr, &ysrr, &zsrr, &tsrr);
+  int16_t xsrr3, ysrr3, zsrr3, tsrr3;
+  tlx493d_gen_3_convertTemperatureToRaw(&dut, tsr0, &tsrr3);
+  dut.functions->calculateRawMagneticFieldAtTemperature(
+      &dut, tsrr, TLx493D_SHORT_RANGE_e, xsr, ysr, zsr, &xsrr3, &ysrr3, &zsrr3);
 
-    int16_t xsrr3, ysrr3, zsrr3, tsrr3;
-    tlx493d_gen_3_convertTemperatureToRaw(&dut, tsr0, &tsrr3);
-    dut.functions->calculateRawMagneticFieldAtTemperature(&dut, tsrr, TLx493D_SHORT_RANGE_e, xsr, ysr, zsr, &xsrr3, &ysrr3, &zsrr3);
+  TEST_ASSERT_EQUAL_FLOAT(tsr, tsr0);
+  TEST_ASSERT_EQUAL_INT16(tsrr, tsrr3);
+  TEST_ASSERT_EQUAL_INT16(xsrr, xsrr3);
+  TEST_ASSERT_EQUAL_INT16(ysrr, ysrr3);
+  TEST_ASSERT_EQUAL_INT16(zsrr, zsrr3);
 
-    TEST_ASSERT_EQUAL_FLOAT( tsr, tsr0 );
-    TEST_ASSERT_EQUAL_INT16( tsrr, tsrr3 );
-    TEST_ASSERT_EQUAL_INT16( xsrr, xsrr3 );
-    TEST_ASSERT_EQUAL_INT16( ysrr, ysrr3 );
-    TEST_ASSERT_EQUAL_INT16( zsrr, zsrr3 );
+  TEST_ASSERT_FLOAT_WITHIN(2, tfr0, tsr0);
+  TEST_ASSERT_FLOAT_WITHIN(1, xsr, xfr);
+  TEST_ASSERT_FLOAT_WITHIN(1, ysr, yfr);
+  TEST_ASSERT_FLOAT_WITHIN(1, zsr, zfr);
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  // TLx493D_EXTRA_SHORT_RANGE_e
+  real xesr, yesr, zesr, tesr, tesr0;
 
-    TEST_ASSERT_FLOAT_WITHIN( 2, tfr0, tsr0 );
-    TEST_ASSERT_FLOAT_WITHIN( 1, xsr, xfr );
-    TEST_ASSERT_FLOAT_WITHIN( 1, ysr, yfr );
-    TEST_ASSERT_FLOAT_WITHIN( 1, zsr, zfr );
+  TEST_ASSERT_TRUE(
+      dut.functions->setSensitivity(&dut, TLx493D_EXTRA_SHORT_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->getTemperature(&dut, &tesr0));
+  // tlx493d_printRegisters(&dut);
 
+  int16_t xesrr, yesrr, zesrr, tesrr;
+  dut.functions->calculateMagneticFieldAndTemperature(&dut, &xesr, &yesr, &zesr,
+                                                      &tesr);
+  dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xesrr, &yesrr,
+                                                         &zesrr, &tesrr);
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // TLx493D_EXTRA_SHORT_RANGE_e
-    double xesr, yesr, zesr, tesr, tesr0;
+  int16_t xesrr3, yesrr3, zesrr3, tesrr3;
+  tlx493d_gen_3_convertTemperatureToRaw(&dut, tesr0, &tesrr3);
+  dut.functions->calculateRawMagneticFieldAtTemperature(
+      &dut, tesrr, TLx493D_EXTRA_SHORT_RANGE_e, xesr, yesr, zesr, &xesrr3,
+      &yesrr3, &zesrr3);
 
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_EXTRA_SHORT_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->getTemperature(&dut, &tesr0) );
-    // tlx493d_printRegisters(&dut);
+  TEST_ASSERT_EQUAL_FLOAT(tesr, tesr0);
+  TEST_ASSERT_EQUAL_INT16(tesrr, tesrr3);
+  TEST_ASSERT_EQUAL_INT16(xesrr, xesrr3);
+  TEST_ASSERT_EQUAL_INT16(yesrr, yesrr3);
+  TEST_ASSERT_EQUAL_INT16(zesrr, zesrr3);
 
-    int16_t xesrr, yesrr, zesrr, tesrr;
-    dut.functions->calculateMagneticFieldAndTemperature(&dut, &xesr, &yesr, &zesr, &tesr);
-    dut.functions->calculateRawMagneticFieldAndTemperature(&dut, &xesrr, &yesrr, &zesrr, &tesrr);
+  TEST_ASSERT_FLOAT_WITHIN(2, tfr0, tesr0);
+  TEST_ASSERT_FLOAT_WITHIN(1, xesr, xfr);
+  TEST_ASSERT_FLOAT_WITHIN(1, yesr, yfr);
+  TEST_ASSERT_FLOAT_WITHIN(1, zesr, zfr);
 
-    int16_t xesrr3, yesrr3, zesrr3, tesrr3;
-    tlx493d_gen_3_convertTemperatureToRaw(&dut, tesr0, &tesrr3);
-    dut.functions->calculateRawMagneticFieldAtTemperature(&dut, tesrr, TLx493D_EXTRA_SHORT_RANGE_e, xesr, yesr, zesr, &xesrr3, &yesrr3, &zesrr3);
-
-    TEST_ASSERT_EQUAL_FLOAT( tesr, tesr0 );
-    TEST_ASSERT_EQUAL_INT16( tesrr, tesrr3 );
-    TEST_ASSERT_EQUAL_INT16( xesrr, xesrr3 );
-    TEST_ASSERT_EQUAL_INT16( yesrr, yesrr3 );
-    TEST_ASSERT_EQUAL_INT16( zesrr, zesrr3 );
-
-
-    TEST_ASSERT_FLOAT_WITHIN( 2, tfr0, tesr0 );
-    TEST_ASSERT_FLOAT_WITHIN( 1, xesr, xfr );
-    TEST_ASSERT_FLOAT_WITHIN( 1, yesr, yfr );
-    TEST_ASSERT_FLOAT_WITHIN( 1, zesr, zfr );
-
-
-    // back to TLx493D_FULL_RANGE_e
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e) );
+  // back to TLx493D_FULL_RANGE_e
+  TEST_ASSERT_TRUE(dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e));
 }
 
 
@@ -294,37 +300,43 @@ TEST_IFX(TLx493D_P3B6_needsSensorInternal, checkConfigTriggerFunctionality)
 
 TEST_IFX(TLx493D_P3B6_needsSensorInternal, checkConfigSensitivityFunctionality)
 {
-    double sf;
+  real sf;
 
-    // Unsupported
-    TEST_ASSERT( (tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e) & tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e)) != 1 );
+  // Unsupported
+  TEST_ASSERT((tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e) &
+               tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e)) != 1);
 
-    // supported
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_EXTRA_SHORT_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->readRegistersAndCheck(&dut));
-    TEST_ASSERT_EQUAL_HEX8( 0x01, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e) );
-    TEST_ASSERT_EQUAL_HEX8( 0x00, tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e) );
+  // supported
+  TEST_ASSERT_TRUE(
+      dut.functions->setSensitivity(&dut, TLx493D_EXTRA_SHORT_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->readRegistersAndCheck(&dut));
+  TEST_ASSERT_EQUAL_HEX8(
+      0x01, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e));
+  TEST_ASSERT_EQUAL_HEX8(0x00,
+                         tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e));
 
-    sf = dut.functions->getSensitivityScaleFactor(&dut);
-    TEST_ASSERT_EQUAL_FLOAT( 4.0, sf );
+  sf = dut.functions->getSensitivityScaleFactor(&dut);
+  TEST_ASSERT_EQUAL_FLOAT(4.0, sf);
 
+  TEST_ASSERT_TRUE(dut.functions->setSensitivity(&dut, TLx493D_SHORT_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->readRegistersAndCheck(&dut));
+  TEST_ASSERT_EQUAL_HEX8(
+      0x00, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e));
+  TEST_ASSERT_EQUAL_HEX8(0x01,
+                         tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e));
 
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_SHORT_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->readRegistersAndCheck(&dut));
-    TEST_ASSERT_EQUAL_HEX8( 0x00, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e) );
-    TEST_ASSERT_EQUAL_HEX8( 0x01, tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e) );
+  sf = dut.functions->getSensitivityScaleFactor(&dut);
+  TEST_ASSERT_EQUAL_FLOAT(2.0, sf);
 
-    sf = dut.functions->getSensitivityScaleFactor(&dut);
-    TEST_ASSERT_EQUAL_FLOAT( 2.0, sf );
-    
+  TEST_ASSERT_TRUE(dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e));
+  TEST_ASSERT_TRUE(dut.functions->readRegistersAndCheck(&dut));
+  TEST_ASSERT_EQUAL_HEX8(
+      0x00, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e));
+  TEST_ASSERT_EQUAL_HEX8(0x00,
+                         tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e));
 
-    TEST_ASSERT_TRUE( dut.functions->setSensitivity(&dut, TLx493D_FULL_RANGE_e) );
-    TEST_ASSERT_TRUE( dut.functions->readRegistersAndCheck(&dut));
-    TEST_ASSERT_EQUAL_HEX8( 0x00, tlx493d_common_returnBitfield(&dut, P3B6_XTR_SHORT_EN_e) );
-    TEST_ASSERT_EQUAL_HEX8( 0x00, tlx493d_common_returnBitfield(&dut, P3B6_SHORT_EN_e) );
-
-    sf = dut.functions->getSensitivityScaleFactor(&dut);
-    TEST_ASSERT_EQUAL_FLOAT( 1.0, sf );
+  sf = dut.functions->getSensitivityScaleFactor(&dut);
+  TEST_ASSERT_EQUAL_FLOAT(1.0, sf);
 }
 
 

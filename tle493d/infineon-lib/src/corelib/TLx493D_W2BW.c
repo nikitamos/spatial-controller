@@ -220,34 +220,38 @@ bool TLx493D_W2BW_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *
     return tlx493d_common_getRawMagneticFieldAndTemperature(sensor, x, y, z, temperature);
 }
 
-
-void TLx493D_W2BW_calculateTemperature(TLx493D_t *sensor, double *temp) {
-    tlx493d_gen_2_calculateTemperature(sensor, W2BW_TEMP_MSBS_e, W2BW_TEMP_LSBS_e, temp);
+void TLx493D_W2BW_calculateTemperature(TLx493D_t *sensor, real *temp) {
+  tlx493d_gen_2_calculateTemperature(sensor, W2BW_TEMP_MSBS_e, W2BW_TEMP_LSBS_e,
+                                     temp);
 }
 
-bool TLx493D_W2BW_getTemperature(TLx493D_t *sensor, double *temp) {
-    return tlx493d_common_getTemperature(sensor, temp);
+bool TLx493D_W2BW_getTemperature(TLx493D_t *sensor, real *temp) {
+  return tlx493d_common_getTemperature(sensor, temp);
 }
 
-void TLx493D_W2BW_calculateMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    tlx493d_gen_2_calculateMagneticField(sensor, W2BW_BX_MSBS_e, W2BW_BX_LSBS_e, W2BW_BY_MSBS_e, W2BW_BY_LSBS_e, W2BW_BZ_MSBS_e, W2BW_BZ_LSBS_e, x, y, z);
+void TLx493D_W2BW_calculateMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                         real *z) {
+  tlx493d_gen_2_calculateMagneticField(sensor, W2BW_BX_MSBS_e, W2BW_BX_LSBS_e,
+                                       W2BW_BY_MSBS_e, W2BW_BY_LSBS_e,
+                                       W2BW_BZ_MSBS_e, W2BW_BZ_LSBS_e, x, y, z);
 }
 
-bool TLx493D_W2BW_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z) {
-    return tlx493d_common_getMagneticField(sensor, x, y, z);
+bool TLx493D_W2BW_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                   real *z) {
+  return tlx493d_common_getMagneticField(sensor, x, y, z);
 }
 
-
-void TLx493D_W2BW_calculateMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    TLx493D_W2BW_calculateMagneticField(sensor, x, y, z);
-    TLx493D_W2BW_calculateTemperature(sensor, temp);
+void TLx493D_W2BW_calculateMagneticFieldAndTemperature(TLx493D_t *sensor,
+                                                       real *x, real *y,
+                                                       real *z, real *temp) {
+  TLx493D_W2BW_calculateMagneticField(sensor, x, y, z);
+  TLx493D_W2BW_calculateTemperature(sensor, temp);
 }
 
-
-bool TLx493D_W2BW_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temp) {
-    return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
+bool TLx493D_W2BW_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                 real *y, real *z, real *temp) {
+  return tlx493d_common_getMagneticFieldAndTemperature(sensor, x, y, z, temp);
 }
-
 
 bool TLx493D_W2BW_setMeasurement(TLx493D_t *sensor, TLx493D_MeasurementType_t val) {
     return tlx493d_gen_2_setMeasurement(sensor, W2BW_DT_e, W2BW_AM_e, W2BW_CP_e, val);
@@ -376,16 +380,16 @@ bool TLx493D_W2BW_setWakeUpThresholdsAsInteger(TLx493D_t *sensor, int16_t xlTh, 
 
 
 /** thesholds im mT, to be converted to proper format */
-bool TLx493D_W2BW_setWakeUpThresholds(TLx493D_t *sensor,
-                                      double temperature, double xLow, double xHigh, double yLow, double yHigh, double zLow, double zHigh) {
-    return tlx493d_gen_2_setWakeUpThresholds(sensor, W2BW_CP_e,
-                                             W2BW_XL_MSBS_e, W2BW_XL_LSBS_e, W2BW_XH_MSBS_e, W2BW_XH_LSBS_e,
-                                             W2BW_YL_MSBS_e, W2BW_YL_LSBS_e, W2BW_YH_MSBS_e, W2BW_YH_LSBS_e,
-                                             W2BW_ZL_MSBS_e, W2BW_ZL_LSBS_e, W2BW_ZH_MSBS_e, W2BW_ZH_LSBS_e,
-                                             TLx493D_HAS_X4_e, W2BW_X2_e, W2BW_X4_READWRITE_e,
-                                             temperature, xLow, xHigh, yLow, yHigh, zLow, zHigh);
+bool TLx493D_W2BW_setWakeUpThresholds(TLx493D_t *sensor, real temperature,
+                                      real xLow, real xHigh, real yLow,
+                                      real yHigh, real zLow, real zHigh) {
+  return tlx493d_gen_2_setWakeUpThresholds(
+      sensor, W2BW_CP_e, W2BW_XL_MSBS_e, W2BW_XL_LSBS_e, W2BW_XH_MSBS_e,
+      W2BW_XH_LSBS_e, W2BW_YL_MSBS_e, W2BW_YL_LSBS_e, W2BW_YH_MSBS_e,
+      W2BW_YH_LSBS_e, W2BW_ZL_MSBS_e, W2BW_ZL_LSBS_e, W2BW_ZH_MSBS_e,
+      W2BW_ZH_LSBS_e, TLx493D_HAS_X4_e, W2BW_X2_e, W2BW_X4_READWRITE_e,
+      temperature, xLow, xHigh, yLow, yHigh, zLow, zHigh);
 }
-
 
 bool TLx493D_W2BW_softwareReset(TLx493D_t *sensor) {
     tlx493d_warnFeatureNotAvailableForSensorType(sensor, "softwareReset");
@@ -469,18 +473,17 @@ uint8_t TLx493D_W2BW_selectIICAddress(const TLx493D_t *sensor, TLx493D_IICAddres
     return tlx493d_gen_2_selectIICAddress(sensor, addr);
 }
 
-
-void TLx493D_W2BW_calculateRawMagneticFieldAtTemperature(const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
-                                                         double xInmT, double yInmT, double zInmT,
-                                                         int16_t *x, int16_t *y, int16_t *z) {
-    tlx493d_gen_2_calculateRawMagneticFieldAtTemperature(sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
+void TLx493D_W2BW_calculateRawMagneticFieldAtTemperature(
+    const TLx493D_t *sensor, int16_t rawTemp, TLx493D_SensitivityType_t sens,
+    real xInmT, real yInmT, real zInmT, int16_t *x, int16_t *y, int16_t *z) {
+  tlx493d_gen_2_calculateRawMagneticFieldAtTemperature(
+      sensor, rawTemp, sens, xInmT, yInmT, zInmT, x, y, z);
 }
 
-
-double TLx493D_W2BW_getSensitivityScaleFactor(const TLx493D_t *sensor) {
-    return tlx493d_gen_2_getSensitivityScaleFactor(sensor, TLx493D_HAS_X4_e, W2BW_X2_e, W2BW_X4_READWRITE_e);
+real TLx493D_W2BW_getSensitivityScaleFactor(const TLx493D_t *sensor) {
+  return tlx493d_gen_2_getSensitivityScaleFactor(
+      sensor, TLx493D_HAS_X4_e, W2BW_X2_e, W2BW_X4_READWRITE_e);
 }
-
 
 void TLx493D_W2BW_printRegisters(const TLx493D_t *sensor) {
     logPrintRegisters(sensor, TLX493D_W2BW_REGISTER_HEADLINE); 

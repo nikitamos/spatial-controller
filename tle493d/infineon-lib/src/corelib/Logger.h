@@ -57,11 +57,11 @@ extern "C" {
 void logPrintRegisters(const TLx493D_t *sensor, const char *headLine);
 
 /**
- * @brief The function `logPrintDouble` prints out a value in the double format. 
- * 
- * @param[in] d Value which will be printed to the serial monitor. 
+ * @brief The function `logPrintDouble` prints out a value in the real format.
+ *
+ * @param[in] d Value which will be printed to the serial monitor.
  */
-void logPrintDouble(double d);
+void logPrintDouble(real d);
 
 /**
  * @brief The function `logPrint` is used to print out a formatted string - without prefix - to the serial output.

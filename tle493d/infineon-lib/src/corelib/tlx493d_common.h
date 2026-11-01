@@ -37,11 +37,12 @@ void tlx493d_common_calculateRawMagneticField(TLx493D_t *sensor, uint8_t bxMSBBF
 bool tlx493d_common_getRawMagneticField(TLx493D_t *sensor, int16_t *x, int16_t *y, int16_t *z);
 bool tlx493d_common_getRawMagneticFieldAndTemperature(TLx493D_t *sensor, int16_t *x, int16_t *y, int16_t *z, int16_t *temperature);
 
-
-bool tlx493d_common_getTemperature(TLx493D_t *sensor, double *temperature);
-bool tlx493d_common_getMagneticField(TLx493D_t *sensor, double *x, double *y, double *z);
-bool tlx493d_common_getMagneticFieldAndTemperature(TLx493D_t *sensor, double *x, double *y, double *z, double *temperature);
-
+bool tlx493d_common_getTemperature(TLx493D_t *sensor, real *temperature);
+bool tlx493d_common_getMagneticField(TLx493D_t *sensor, real *x, real *y,
+                                     real *z);
+bool tlx493d_common_getMagneticFieldAndTemperature(TLx493D_t *sensor, real *x,
+                                                   real *y, real *z,
+                                                   real *temperature);
 
 /** utilities. */
 uint8_t tlx493d_common_calculateParity(uint8_t dataIn);

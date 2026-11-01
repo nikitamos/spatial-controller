@@ -7,7 +7,8 @@ use embassy_executor::Spawner;
 use embassy_futures::join::join;
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
-use embassy_stm32::{Config, bind_interrupts, dma, i2c, peripherals, usb};
+use embassy_stm32::{Config, bind_interrupts, dma, i2c, pac, peripherals, usb};
+use embassy_time::Timer;
 use embassy_usb::Builder;
 use panic_probe as _;
 
@@ -41,35 +42,38 @@ async fn main(spawner: Spawner) {
         config.rcc.pll_src = PllSource::HSE;
         config.rcc.pll = Some(Pll {
             prediv: PllPreDiv::DIV25,
-            mul: PllMul::MUL336,
-            divp: Some(PllPDiv::DIV2), // 25mhz / 25 * 336 / 2 = 168mhz
-            divq: Some(PllQDiv::DIV7), // 25mhz / 25 * 336 / 7 = 48mhz
+            mul: PllMul::MUL192,
+            divp: Some(PllPDiv::DIV2), // 25mhz / 25 * 192 / 2 = 96mhz
+            divq: Some(PllQDiv::DIV4), // 25mhz / 25 * 192 / 4 = 48mhz
             divr: None,
         });
         config.rcc.mux.clk48sel = mux::Clk48sel::PLL1_Q;
         config.rcc.ahb_pre = AHBPrescaler::DIV1;
-        config.rcc.apb1_pre = APBPrescaler::DIV4;
-        config.rcc.apb2_pre = APBPrescaler::DIV2;
-        config.rcc.mux.clk48sel = mux::Clk48sel::PLL1_Q;
+        config.rcc.apb1_pre = APBPrescaler::DIV2;
+        config.rcc.apb2_pre = APBPrescaler::DIV1;
+        config.rcc.sys = Sysclk::PLL1_P;
     }
     let p = embassy_stm32::init(config);
-    info!("initialized");
 
-    // let delay = ;
     let mut i2c_cfg = i2c::Config::default();
-    i2c_cfg.frequency = Hertz::khz(100);
-    // i2c_cfg.gpio_speed = embassy_stm32::gpio::Speed::Medium;
-    i2c_cfg.scl_pullup = true;
-    i2c_cfg.sda_pullup = true;
-    let _i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
+    i2c_cfg.frequency = Hertz::khz(400);
+    i2c_cfg.scl_pullup = false;
+    i2c_cfg.sda_pullup = false;
+    let mut i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
     info!("i2c created");
+    i2c_scan(&mut i2c).await;
 
-    let mut i2c_iface = tle493d::i2c::I2cInterface::new(_i2c);
+    let mut i2c_iface = tle493d::i2c::I2cInterface::new(i2c);
     let mut regmap = [0; tle493d::types::W2B6::REG_MAP_SIZE];
     let vtbl = i2c_iface.vtable_copy();
-    let mut tle = tle493d::Tlx493d::new(tle493d::types::W2B6::A0, &mut regmap, &mut i2c_iface, &vtbl).unwrap();
-    let field = tle.get_magnetic_field().unwrap();
-    defmt::info!("measured field: {}", &field);
+    let mut tle =
+        tle493d::Tlx493d::new(tle493d::types::W2B6::A0, &mut regmap, &mut i2c_iface, &vtbl)
+            .unwrap();
+    loop {
+        Timer::after_millis(200).await;
+        let field = tle.get_magnetic_field().unwrap();
+        defmt::info!("measured field: {}", &field);
+    }
 
     // let mut mag = TLE493DW2B6::new(
     //     i2c,
@@ -155,7 +159,7 @@ fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleColl
         UsbHidProviderBuilder::new(usb_builder)
             .add_report_descriptor(&docking::reports::DESCRIPTOR)
     );
-    
+
     let sink = hid_module.comm();
 
     init_module!(

@@ -1,5 +1,5 @@
 [toolchain]
 channel = "1.98.1"
 components = ["rustc", "cargo", "clippy", "rustfmt"]
-targets = ["thumbv7em-none-eabi"]
+targets = ["thumbv7em-none-eabihf"]
 profile = "minimal"

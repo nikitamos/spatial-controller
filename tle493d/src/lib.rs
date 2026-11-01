@@ -9,19 +9,44 @@ pub enum Error {
 }
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
-use core::{arch::asm, ffi::{c_double, c_long}, marker::PhantomData};
+trait BoolExt {
+    fn ok_or_unknown<T>(self, ok: T) -> Result<T>;
+}
+
+impl BoolExt for bool {
+    fn ok_or_unknown<T>(self, ok: T) -> Result<T> {
+        if self { Ok(ok) } else { Err(Error::Unknown) }
+    }
+}
+
+impl From<bool> for Result<(), Error> {
+    fn from(value: bool) -> Self {
+        value.ok_or(Error::Unknown)
+    }
+}
+
+use core::{
+    arch::asm,
+    ffi::{c_double, c_long},
+    marker::PhantomData,
+};
 
 use embedded_hal::i2c::I2c;
 
 use crate::{bindings::TLx493D_t, types::SensorType};
 
-#[allow(non_camel_case_types, non_snake_case, non_upper_case_globals, dead_code)]
+#[allow(
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    dead_code
+)]
 mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
-pub mod types;
 pub mod i2c;
+pub mod types;
 
 /// Initializes the raw sensor structure. It is equivalent to
 /// `tlx493d_init` from the official library. This function
@@ -48,12 +73,14 @@ unsafe fn init_tle_struct<T: SensorType>(reg_map: &mut [u8]) -> Result<TLx493D_t
     }
 }
 
-
 pub struct Tlx493d<'m, I: I2c> {
     tle: TLx493D_t,
     // TODO: Ensure invariance over `'m`.
     _p: PhantomData<&'m mut I>,
 }
+
+type MagneticField = [i16; 3];
+type Float = c_double;
 
 impl<'m, I: I2c> Tlx493d<'m, I> {
     pub fn new<S: types::SensorType>(
@@ -71,6 +98,57 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
             _p: PhantomData,
         })
     }
+
+    /// Reads registers from a TLx493D sensor.
+    /// It is reading out the complete register map of the sensor and is saving the current
+    /// values to the "internal" register map of the sensor object.
+    pub fn read_registers(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_readRegisters(&raw mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Retrieves the raw temperature from a TLx493D sensor.
+    /// The function is reading out the temperature registers of the sensor and is returning its value as LSB.
+    pub fn get_raw_temperature(&mut self) -> Result<i16> {
+        let mut res = 0;
+        unsafe {
+            bindings::tlx493d_getRawTemperature(&raw mut self.tle, &raw mut res).ok_or_unknown(res)
+        }
+    }
+
+    /// Retrieves the raw magnetic field values from a TLx493D sensor.
+    /// The function is reading the magnetic field value registers of the
+    /// sensor and is returning them as LSB for the X, Y, Z-direction.
+    pub fn get_raw_magnetic_field(&mut self) -> Result<MagneticField> {
+        let mut field = [0; 3];
+        unsafe {
+            bindings::tlx493d_getRawMagneticField(
+                &raw mut self.tle,
+                &raw mut field[0],
+                &raw mut field[1],
+                &raw mut field[2],
+            )
+            .ok_or_unknown(field)
+        }
+    }
+
+    /// Retrieves the raw magnetic field and temperature values from a TLx493D sensor.
+    /// The function is reading out the magnetic field value registers, as well as the
+    /// temperature value registers of the sensor and is returning them as LSB.
+    pub fn get_raw_magnetic_field_and_temperature(&mut self) -> Result<(MagneticField, i16)> {
+        let mut field = [0; 3];
+        let mut temp: i16 = 0;
+        unsafe {
+            bindings::tlx493d_getRawMagneticFieldAndTemperature(
+                &raw mut self.tle,
+                &raw mut field[0],
+                &raw mut field[1],
+                &raw mut field[2],
+                &raw mut temp,
+            ).ok_or_unknown((field, temp))
+        }
+    }
+
+    // pub fn 
 
 }
 

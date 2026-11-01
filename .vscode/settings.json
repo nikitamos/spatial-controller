@@ -1,4 +1,12 @@
 {
     // "rust-analyzer.cargo.target": "thumbv7em-none-eabi",
-    "rust-analyzer.check.allTargets": false
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.cargo.extraEnv": {
+        "CC": "/usr/bin/clang",
+        "CFLAGS": "-I/usr/arm-none-eabi/include/"
+    },
+    "cSpell.words": [
+        "Infineon",
+        "defmt"
+    ]
 }

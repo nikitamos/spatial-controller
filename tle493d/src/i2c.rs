@@ -87,7 +87,7 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
     rx_len: u8,
 ) -> bool {
     let sensor = unsafe { sensor.as_mut_unchecked() };
-    let address = unsafe { sensor.comInterface.comLibParams.iic_params.address };
+    let address = unsafe { sensor.comInterface.comLibParams.iic_params.address } >> 1;
     // like wire->transfer(sensor->comInterface.comLibParams.iic_params.address >> 1, txBuffer, txLen, rxBuffer, rxLen)
     let tx_buffer = if tx_buffer.is_null() || tx_len == 0 {
         &[]
@@ -108,10 +108,15 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
             .as_mut_unchecked()
     };
 
+    #[cfg(feature = "defmt")]
+    defmt::trace!("i2c: tx={:02x} rx_len={}", tx_buffer, rx_len);
+
+    // TODO: consider whether I2c::transaction is appropriate here
     if !tx_buffer.is_empty() {
         let res = i2c.i2c.write(address, tx_buffer);
-        if let Err(_e) = res {
-            // todo: log error
+        if let Err(e) = res {
+            #[cfg(feature = "defmt")]
+            defmt::error!("i2c write failed: {}", defmt::Debug2Format(&e));
             return false;
         }
     }
@@ -119,8 +124,8 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
         // FIXME: the behavior may be different from original Arduino implementation
         // that probably doesn't send ST at the end of transmission.
         let res = i2c.i2c.read(address, rx_buffer);
-        if let Err(_e) = res {
-            // todo: log result
+        if let Err(e) = res {
+            defmt::error!("i2c read failed: {}", defmt::Debug2Format(&e));
             return false;
         }
     }

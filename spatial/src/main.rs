@@ -4,7 +4,7 @@
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
-use embassy_futures::join::join;
+use embassy_futures::join::{join, join3};
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
 use embassy_stm32::{Config, bind_interrupts, dma, i2c, pac, peripherals, usb};
@@ -22,10 +22,6 @@ use tle493d::types::SensorType;
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
-    I2C1_EV => i2c::EventInterruptHandler<peripherals::I2C1>;
-    I2C1_ER => i2c::ErrorInterruptHandler<peripherals::I2C1>;
-    DMA1_STREAM0 => dma::InterruptHandler<peripherals::DMA1_CH0>;
-    DMA1_STREAM1 => dma::InterruptHandler<peripherals::DMA1_CH1>;
 });
 
 type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
@@ -59,9 +55,7 @@ async fn main(spawner: Spawner) {
     i2c_cfg.frequency = Hertz::khz(400);
     i2c_cfg.scl_pullup = false;
     i2c_cfg.sda_pullup = false;
-    let mut i2c = I2c::new(p.I2C1, p.PB6, p.PB7, p.DMA1_CH1, p.DMA1_CH0, Irqs, i2c_cfg);
-    info!("i2c created");
-    i2c_scan(&mut i2c).await;
+    let i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB7, i2c_cfg);
 
     let mut i2c_iface = tle493d::i2c::I2cInterface::new(i2c);
     let mut regmap = [0; tle493d::types::W2B6::REG_MAP_SIZE];
@@ -69,11 +63,13 @@ async fn main(spawner: Spawner) {
     let mut tle =
         tle493d::Tlx493d::new(tle493d::types::W2B6::A0, &mut regmap, &mut i2c_iface, &vtbl)
             .unwrap();
-    loop {
-        Timer::after_millis(200).await;
-        let field = tle.get_magnetic_field().unwrap();
-        defmt::info!("measured field: {}", &field);
-    }
+    let read_sensor = async move {
+        loop {
+            Timer::after_millis(400).await;
+            let field = tle.get_magnetic_field().unwrap();
+            defmt::info!("measured field: {}", &field);
+        }
+    };
 
     // let mut mag = TLE493DW2B6::new(
     //     i2c,
@@ -149,7 +145,7 @@ async fn main(spawner: Spawner) {
     let mut dev = usb_builder.build();
     debug!("buffer usage: {}", dev.buffer_usage());
 
-    join(dev.run(), modules.run(&spawner)).await;
+    join3(dev.run(), modules.run(&spawner), read_sensor).await;
     // x.run
 }
 

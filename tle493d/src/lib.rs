@@ -69,14 +69,35 @@ unsafe fn init_tle_struct<T: SensorType>(reg_map: &mut [u8]) -> Result<TLx493D_t
 
 pub struct Tlx493d<'m, I: I2c> {
     tle: TLx493D_t,
-    // TODO: Ensure invariance over `'m`.
     _p: PhantomData<&'m mut I>,
 }
 
+/// Represents the magnetic field in millitesla or raw magnetometer
+/// units. Currently it is an alias to array, where magnetic field
+/// components are laid in conventional order (Bx, By, Bz).
 pub type MagneticField<T = i16> = [T; 3];
+
+/// Alias to the floating point type used by the library.
+/// 
+/// By default, it maps to `f32` since it is more common
+/// for embedded platforms to have hardware support of
+/// single-precision floats.
+/// 
+/// Please not that original Infineon's C library uses
+/// `double` exclusively, so some features may behave
+/// oddly with `f32`. `f64` can be enabled by the
+/// `use-f64` feature.
 pub type Float = bindings::real;
 
 impl<'m, I: I2c> Tlx493d<'m, I> {
+
+    /// Initializes the TLx493D sensor.
+    /// 
+    /// This function performs similarly to the `TLx493D<_,_,_>::begin()` from
+    /// the Infineon's C++ library: it initializes the structure, populates vtable for the
+    /// I2C communication interface and resets the sensor's configuration.
+    /// The only difference is that it doesn't initialize the I2C bus (it is
+    /// passed already in initialized state) and board support class.
     pub fn new<S: types::SensorType>(
         typ: S,
         reg_map: &'m mut [u8],
@@ -87,10 +108,12 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         // in `Self` which is valid for `'m`
         let mut tle = unsafe { init_tle_struct::<S>(reg_map)? };
         unsafe { i2c::init_communication(&mut tle, i2c, vtable, typ.address_raw()) };
-        Ok(Self {
+        let mut this = Self {
             tle,
             _p: PhantomData,
-        })
+        };
+        this.set_default_config()?;
+        Ok(this)
     }
 
     /// Reads registers from a TLx493D sensor.
@@ -183,12 +206,16 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         }
     }
 
+    /// The function sets the default configuration for a TLx493D sensor.
+    /// It puts the sensor into the 1-Byte-Read-Mode and turns off the interrupt.
+    /// This is required to guarantee the proper functionality of the sensor.
+    ///
+    /// **Note**: this function is called by [`Self::new`] as a part of the initialization.
+    pub fn set_default_config(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_setDefaultConfig(&mut self.tle).ok_or(Error::Unknown) }
+    }
+
     // TODO: set measurement, set trigger, sensitivity, default config, i2c address, collision avoidance
 }
 
 pub mod reverse_bindings;
-
-// #[unsafe(no_mangle)]
-// unsafe extern "C" fn real_round(x: c_double) -> c_long {
-//     unsafe {x.to_int_unchecked()}
-// }

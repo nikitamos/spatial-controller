@@ -1,10 +1,10 @@
 use core::{marker::PhantomData, slice};
 
 use crate::bindings::{self, TLx493D_IICAddressType_t, TLx493D_t};
-use embedded_hal::i2c::I2c;
+use embedded_hal::{delay::DelayNs, i2c::I2c};
 
 pub struct I2cInterface<I: I2c> {
-    i2c: I,
+    pub(crate) i2c: I,
 }
 
 pub struct I2cInterfaceVTable<I: I2c> {
@@ -23,6 +23,21 @@ impl<I: I2c> core::ops::Deref for I2cInterfaceVTable<I> {
 impl<I: I2c> Default for I2cInterfaceVTable<I> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Gets the I2C communication interface used by `tle`.
+///
+/// # Safety
+/// The caller must ensure that `tle.comLibObj.iic_obj` is
+/// convertible to reference to `I2cInterface<I>`
+pub(crate) unsafe fn get_i2c<I: I2c>(tle: &mut TLx493D_t) -> &mut I2cInterface<I> {
+    unsafe {
+        tle.comInterface
+            .comLibObj
+            .iic_obj
+            .cast::<I2cInterface<I>>()
+            .as_mut_unchecked()
     }
 }
 
@@ -99,14 +114,7 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
     } else {
         unsafe { slice::from_raw_parts_mut(rx_buffer, rx_len as usize) }
     };
-    let i2c: &mut I2cInterface<I> = unsafe {
-        sensor
-            .comInterface
-            .comLibObj
-            .iic_obj
-            .cast::<I2cInterface<I>>()
-            .as_mut_unchecked()
-    };
+    let i2c: &mut I2cInterface<I> = unsafe { get_i2c(sensor) };
 
     #[cfg(feature = "defmt")]
     defmt::trace!("i2c: tx={:02x} rx_len={}", tx_buffer, rx_len);
@@ -135,8 +143,7 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
 
 /// # Safety
 /// This function is always safe to call, although this may change in future version
-unsafe extern "C" fn i2c_set_read_address_iface<I: I2c>(_sensor: *mut TLx493D_t, _address: u8) {
-}
+unsafe extern "C" fn i2c_set_read_address_iface<I: I2c>(_sensor: *mut TLx493D_t, _address: u8) {}
 
 /// Sets up the sensor's communication vtable.
 /// This is roughly equivalent to the `ifx::tlx493d::initCommunication`
@@ -170,4 +177,50 @@ pub(crate) unsafe fn init_communication<'s, 'c, 'v, I: I2c>(
             .selectIICAddress
             .expect("sensor's vtable must be initialized")(sensor, i2c_addr_type)
     };
+}
+
+/// Performs reset of TLx sensors located on the bus.
+/// After the reset, sensors must be reconfigured.
+/// This function is supposed to be called after the MCU
+/// is reset and before the sensor is created.
+/// 
+/// Although reset is recommended by the datasheet, the official
+/// Infineon library seems to lack this feature at all.
+/// I failed to make the TLE493D-W2B6 work after reset as well.
+/// So ether in certain cases reset may be undesirable or this function
+/// contains a bug.
+///
+/// According to the manuals, various Infineon sensors
+/// expect the following reset sequence:
+/// 1. `<ST>`
+/// 2. `0xFF`
+/// 3. `<SP>`
+/// 4. `<ST>`
+/// 5. `0xFF`
+/// 6. `<SP>`
+/// 7. `<ST>`
+/// 8. `0x00`
+/// 10. `<SP>`
+/// 11. `<ST>`
+/// 12. `0x00`
+/// 13. `<SP>`
+/// 14. 30μs delay
+/// 
+/// Where
+/// * `<ST>` = start condition
+/// * `<SP>` = stop condition
+pub fn bus_reset<I: I2c, D: DelayNs>(mut bus: I, mut delay: D) {
+    #[cfg(feature = "defmt")]
+    defmt::trace!("Performing I2C reset");
+
+    // I2c::read adds additional `0b1` after the address to indicate
+    // read operation.
+    let _ = bus.read(0x7F, &mut []);
+    let _ = bus.read(0x7F, &mut []);
+    let _ = bus.write(0x00, &[]);
+    let _ = bus.write(0x00, &[]);
+    delay.delay_us(30);
+
+    #[cfg(feature = "defmt")]
+    defmt::trace!("I2c reset sequence sent");
 }

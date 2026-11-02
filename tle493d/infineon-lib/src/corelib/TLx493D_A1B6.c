@@ -551,8 +551,8 @@ uint8_t TLx493D_A1B6_calculateConfigurationParity(TLx493D_t *sensor) {
 
 
 bool TLx493D_A1B6_hasValidFuseParity(const TLx493D_t *sensor){
-    TLx493D_Register_t *bf = &sensor->regDef[A1B6_FF_e];
-    return ((sensor->regMap[bf->address] & bf->mask) != 0);
+  const TLx493D_Register_t *bf = &sensor->regDef[A1B6_FF_e];
+  return ((sensor->regMap[bf->address] & bf->mask) != 0);
 }
 
 
@@ -587,8 +587,8 @@ bool TLx493D_A1B6_hasValidIICadr(const TLx493D_t *sensor) {
 
 
 bool TLx493D_A1B6_hasValidTBit(const TLx493D_t *sensor) {
-    TLx493D_Register_t *bf = &sensor->regDef[A1B6_T_e];
-    return ((sensor->regMap[bf->address] & bf->mask) == 0);
+  const TLx493D_Register_t *bf = &sensor->regDef[A1B6_T_e];
+  return ((sensor->regMap[bf->address] & bf->mask) == 0);
 }
 
 

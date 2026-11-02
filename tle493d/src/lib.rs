@@ -21,7 +21,7 @@ impl BoolExt for bool {
 
 use core::marker::PhantomData;
 
-use embedded_hal::i2c::I2c;
+use embedded_hal::{delay::DelayNs, i2c::I2c};
 
 use crate::{bindings::TLx493D_t, types::SensorType};
 
@@ -74,11 +74,11 @@ pub struct Tlx493d<'m, I: I2c> {
 pub type MagneticField<T = i16> = [T; 3];
 
 /// Alias to the floating point type used by the library.
-/// 
+///
 /// By default, it maps to `f32` since it is more common
 /// for embedded platforms to have hardware support of
 /// single-precision floats.
-/// 
+///
 /// Please not that original Infineon's C library uses
 /// `double` exclusively, so some features may behave
 /// oddly with `f32`. `f64` can be enabled by the
@@ -86,9 +86,8 @@ pub type MagneticField<T = i16> = [T; 3];
 pub type Float = bindings::real;
 
 impl<'m, I: I2c> Tlx493d<'m, I> {
-
     /// Initializes the TLx493D sensor.
-    /// 
+    ///
     /// This function performs similarly to the `TLx493D<_,_,_>::begin()` from
     /// the Infineon's C++ library: it initializes the structure, populates vtable for the
     /// I2C communication interface and resets the sensor's configuration.
@@ -209,6 +208,27 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
     /// **Note**: this function is called by [`Self::new`] as a part of the initialization.
     pub fn set_default_config(&mut self) -> Result<()> {
         unsafe { bindings::tlx493d_setDefaultConfig(&mut self.tle).ok_or(Error::Unknown) }
+    }
+
+    /// Performs reset of the sensor. This function is equivalent
+    /// to calling [`i2c::bus_reset`] and then [`Self::set_default_config`].
+    /// Result of the latter call is returned.
+    /// 
+    /// Infineon suggests to reset the sensor after MCU reset, since
+    /// it may enter an incorrect state due to power spikes or ongoing
+    /// communication being aborted.
+    /// 
+    /// The reset sequence may affect another devices connected to
+    /// the same bus. In such cases consider using [`i2c::bus_reset`]
+    /// with subsequent reconfiguration of each affected device.
+    /// 
+    /// Please refer to the documentation of [`i2c::bus_reset`] for further details.
+    pub fn reset<D: DelayNs>(&mut self, delay: D) -> Result<()> {
+        let bus = unsafe {
+            i2c::get_i2c::<I>(&mut self.tle)
+        };
+        i2c::bus_reset(&mut bus.i2c, delay);
+        self.set_default_config()
     }
 
     // TODO: set measurement, set trigger, sensitivity, default config, i2c address, collision avoidance

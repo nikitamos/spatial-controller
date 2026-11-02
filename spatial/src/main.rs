@@ -18,14 +18,17 @@ use spatial::orientation::{OrientationModule, OrientationModuleConfig};
 use spatial::status::{StatusModule, StatusModuleBuilder};
 use spatial::usb::{UsbHidProvider, UsbHidProviderBuilder};
 use spatial::{Module, ModuleBuilder, ModuleCollection, init_module};
-use tle493d::types::SensorType;
+use tle493d::Tlx493d;
+use tle493d::i2c::{I2cInterface, I2cInterfaceVTable};
+use tle493d::types::{SensorType, W2B6};
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
 });
 
 type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
-type EmbassyI2c = embassy_stm32::i2c::I2c<'static, embassy_stm32::mode::Blocking, embassy_stm32::i2c::Master>;
+type EmbassyI2c =
+    embassy_stm32::i2c::I2c<'static, embassy_stm32::mode::Blocking, embassy_stm32::i2c::Master>;
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -57,7 +60,22 @@ async fn main(spawner: Spawner) {
     i2c_cfg.scl_pullup = false;
     i2c_cfg.sda_pullup = false;
 
-    let tle_i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB7, i2c_cfg);
+    #[allow(static_mut_refs)]
+    // SAFETY: references to mutable statics and pointers are created only here
+    let tle = {
+        let i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB7, i2c_cfg);
+        static mut REG_MAP: [u8; W2B6::REG_MAP_SIZE] = [0; W2B6::REG_MAP_SIZE];
+        static VTABLE: I2cInterfaceVTable<EmbassyI2c> = I2cInterfaceVTable::new();
+        static mut I2_IFACE: Option<I2cInterface<EmbassyI2c>> = None;
+        let i2c = unsafe { I2_IFACE.insert(I2cInterface::new(i2c)) };
+        Tlx493d::new(
+            W2B6::A0,
+            unsafe { &mut REG_MAP },
+            i2c,
+            &VTABLE,
+        )
+        .unwrap()
+    };
 
     // ===== USB setup =====
 
@@ -96,7 +114,7 @@ async fn main(spawner: Spawner) {
         )
     };
 
-    let modules = create_modules(&mut usb_builder, tle_i2c);
+    let modules = create_modules(&mut usb_builder, tle);
 
     let mut dev = usb_builder.build();
     debug!("buffer usage: {}", dev.buffer_usage());
@@ -107,7 +125,7 @@ async fn main(spawner: Spawner) {
 
 fn create_modules(
     usb_builder: &mut Builder<'static, Driver>,
-    i2c_tle: EmbassyI2c,
+    tle: Tlx493d<'static, EmbassyI2c>,
 ) -> impl ModuleCollection + use<> {
     let hid_module = init_module!(
         UsbHidProvider<'static, Driver, {spatial::usb::INPUT_BUFFER_SIZE}, {spatial::usb::OUTPUT_BUFFER_SIZE}> :
@@ -119,7 +137,7 @@ fn create_modules(
 
     init_module!(
         hid_module,;
-        OrientationModule<EmbassyI2c> : OrientationModuleConfig::new(sink, i2c_tle),
+        OrientationModule<EmbassyI2c> : OrientationModuleConfig::new(sink, tle),
         StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder, sink),
     )
 }

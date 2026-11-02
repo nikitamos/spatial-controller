@@ -45,6 +45,8 @@ embassy-sync = "0.8.0"
 zerocopy.workspace=true
 usbd-hid.workspace=true
 docking = { version = "0.1.0", path = "../docking" }
+glam = { version = "0.34.2", default-features = false, features=["libm"] }
+libm = "0.2.16"
 # nb = "1.0.0"
 
 

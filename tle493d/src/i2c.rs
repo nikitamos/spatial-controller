@@ -125,6 +125,7 @@ unsafe extern "C" fn i2c_transfer_iface<I: I2c>(
         // that probably doesn't send ST at the end of transmission.
         let res = i2c.i2c.read(address, rx_buffer);
         if let Err(e) = res {
+            #[cfg(feature = "defmt")]
             defmt::error!("i2c read failed: {}", defmt::Debug2Format(&e));
             return false;
         }

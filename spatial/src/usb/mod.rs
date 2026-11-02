@@ -6,8 +6,7 @@ use embassy_usb::{
     class::hid::{Config, HidBootProtocol, HidReaderWriter, HidSubclass, State},
     driver::Driver,
 };
-use usbd_hid::descriptor::SerializedDescriptor;
-use zerocopy::{IntoBytes, KnownLayout};
+use zerocopy::IntoBytes;
 
 use crate::{Module, ModuleBuilder, StaticStorage};
 

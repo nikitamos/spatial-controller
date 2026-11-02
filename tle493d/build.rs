@@ -3,7 +3,7 @@ use std::{collections::HashSet, env, error::Error, path::PathBuf};
 use glob::glob;
 
 pub fn main() -> Result<(), Box<dyn Error>> {
-    let features = env::var("CARGO_CFG_FEATURE").unwrap_or(String::new());
+    let features = env::var("CARGO_CFG_FEATURE").unwrap_or_default();
     let features: HashSet<&str> = features.split(',').collect();
     generate_bindings(&features)?;
     compile_c(&features)?;

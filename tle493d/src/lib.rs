@@ -19,11 +19,7 @@ impl BoolExt for bool {
     }
 }
 
-use core::{
-    arch::asm,
-    ffi::{c_double, c_long},
-    marker::PhantomData,
-};
+use core::marker::PhantomData;
 
 use embedded_hal::i2c::I2c;
 

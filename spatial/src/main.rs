@@ -4,10 +4,10 @@
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
-use embassy_futures::join::{join, join3};
+use embassy_futures::join::join3;
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
-use embassy_stm32::{Config, bind_interrupts, dma, i2c, pac, peripherals, usb};
+use embassy_stm32::{Config, bind_interrupts, i2c, peripherals, usb};
 use embassy_time::Timer;
 use embassy_usb::Builder;
 use panic_probe as _;

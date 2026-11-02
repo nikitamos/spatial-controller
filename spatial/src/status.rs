@@ -8,13 +8,11 @@ use embassy_usb::{
     class::cdc_acm::{self, CdcAcmClass},
     driver::Driver,
 };
-use usbd_hid::descriptor::gen_hid_descriptor;
 
 use crate::{
     Module, ModuleBuilder, StaticStorage,
     usb::{UsbHidSink},
 };
-use usbd_hid::descriptor::SerializedDescriptor;
 
 pub struct StatusModule<'d, D: Driver<'d>> {
     serial: cdc_acm::CdcAcmClass<'d, D>,

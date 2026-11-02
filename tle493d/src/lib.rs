@@ -23,7 +23,10 @@ use core::marker::PhantomData;
 
 use embedded_hal::{delay::DelayNs, i2c::I2c};
 
-use crate::{bindings::TLx493D_t, types::SensorType};
+use crate::{
+    bindings::{TLx493D_MeasurementType_t, TLx493D_t},
+    types::SensorType,
+};
 
 #[allow(
     non_camel_case_types,
@@ -66,6 +69,28 @@ unsafe fn init_tle_struct<T: SensorType>(reg_map: &mut [u8]) -> Result<TLx493D_t
 pub struct Tlx493d<'m, I: I2c> {
     tle: TLx493D_t,
     _p: PhantomData<&'m mut I>,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the different measurement types of the sensors.
+/// You have to make sure that you are using a mode which is available for
+/// your used sensor family (1st Gen, 2nd Gen, etc.).
+pub enum MeasurementType {
+    /// 1st and 2nd generation
+    BxByBz = TLx493D_MeasurementType_t::TLx493D_BxByBz_e as u8,
+    /// 1st and 3rd generation
+    BxByBzTemp = TLx493D_MeasurementType_t::TLx493D_BxByBzTemp_e as u8,
+
+    /// 3rd generation
+    VHallBias = TLx493D_MeasurementType_t::TLx493D_VHall_Bias_e as u8,
+    Spintest = TLx493D_MeasurementType_t::TLx493D_Spintest_e as u8,
+    /// Self-test
+    SAT = TLx493D_MeasurementType_t::TLx493D_SAT_test_e as u8,
+    BxTemp = TLx493D_MeasurementType_t::TLx493D_BxTemp_e as u8,
+    BxBy = TLx493D_MeasurementType_t::TLx493D_BxBy_e as u8,
+    BzTemp = TLx493D_MeasurementType_t::TLx493D_BzTemp_e as u8,
 }
 
 /// Represents the magnetic field in millitesla or raw magnetometer
@@ -210,23 +235,29 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         unsafe { bindings::tlx493d_setDefaultConfig(&mut self.tle).ok_or(Error::Unknown) }
     }
 
+    /// Sets the measurement type for the sensor
+    pub fn set_measurement(&mut self, meas: MeasurementType) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setMeasurement(&mut self.tle, meas as TLx493D_MeasurementType_t::Type)
+                .ok_or_unknown(())
+        }
+    }
+
     /// Performs reset of the sensor. This function is equivalent
     /// to calling [`i2c::bus_reset`] and then [`Self::set_default_config`].
     /// Result of the latter call is returned.
-    /// 
+    ///
     /// Infineon suggests to reset the sensor after MCU reset, since
     /// it may enter an incorrect state due to power spikes or ongoing
     /// communication being aborted.
-    /// 
+    ///
     /// The reset sequence may affect another devices connected to
     /// the same bus. In such cases consider using [`i2c::bus_reset`]
     /// with subsequent reconfiguration of each affected device.
-    /// 
+    ///
     /// Please refer to the documentation of [`i2c::bus_reset`] for further details.
     pub fn reset<D: DelayNs>(&mut self, delay: D) -> Result<()> {
-        let bus = unsafe {
-            i2c::get_i2c::<I>(&mut self.tle)
-        };
+        let bus = unsafe { i2c::get_i2c::<I>(&mut self.tle) };
         i2c::bus_reset(&mut bus.i2c, delay);
         self.set_default_config()
     }

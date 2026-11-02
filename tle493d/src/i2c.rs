@@ -154,6 +154,7 @@ unsafe extern "C" fn i2c_set_read_address_iface<I: I2c>(_sensor: *mut TLx493D_t,
 /// # Safety
 /// 1. `sensor` must be properly initialized
 /// 2. `comm` and `vtable` must outlive sensor
+/// 3. `i2c_addr_type` must be valid value of the `Tlx493D_IIC_AddressType_t` C enum
 ///
 /// # Panics
 /// The function will panic is `sensor.functions.selectIICAddress` is [`None`].
@@ -161,7 +162,7 @@ pub(crate) unsafe fn init_communication<'s, 'c, 'v, I: I2c>(
     sensor: &'s mut TLx493D_t,
     comm: &'c mut I2cInterface<I>,
     vtable: &'v I2cInterfaceVTable<I>,
-    i2c_addr_type: TLx493D_IICAddressType_t,
+    i2c_addr_type: TLx493D_IICAddressType_t::Type,
 ) where
     'v: 's,
     'c: 's,

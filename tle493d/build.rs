@@ -35,9 +35,7 @@ fn generate_bindings(features: &HashSet<&str>) -> Result<(), Box<dyn Error + 'st
     let mut builder = bindgen::builder()
         .headers(headers)
         .use_core()
-        .default_enum_style(bindgen::EnumVariation::Rust {
-            non_exhaustive: false,
-        })
+        .default_enum_style(bindgen::EnumVariation::ModuleConsts)
         .clang_arg("-Iinfineon-lib/src")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
     if features.contains("use-f64") {

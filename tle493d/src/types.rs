@@ -7,9 +7,9 @@ trait Seal {}
 #[allow(private_bounds)]
 pub trait SensorType: Seal {
     type RegMap;
-    const RAW_TYPE: TLx493D_SupportedSensorType_t;
+    const RAW_TYPE: TLx493D_SupportedSensorType_t::Type;
     const REG_MAP_SIZE: usize;
-    fn address_raw(&self) -> TLx493D_IICAddressType_t;
+    fn address_raw(&self) -> TLx493D_IICAddressType_t::Type;
 }
 macro_rules! sensor_type {
     ($newtyp:ident {$($addr:ident: $addr_type:ident,)*} => $typ:ident of $map:path) => {
@@ -22,10 +22,10 @@ macro_rules! sensor_type {
         impl SensorType for $newtyp {
             const REG_MAP_SIZE: usize = { $map as usize };
             type RegMap = [u8; Self::REG_MAP_SIZE];
-            const RAW_TYPE: TLx493D_SupportedSensorType_t = TLx493D_SupportedSensorType_t::$typ;
-            fn address_raw(&self) -> TLx493D_IICAddressType_t {
+            const RAW_TYPE: TLx493D_SupportedSensorType_t::Type = TLx493D_SupportedSensorType_t::$typ;
+            fn address_raw(&self) -> TLx493D_IICAddressType_t::Type {
                 // SAFETY: all $newtyp variants are also valid for TLx493D_IICAddressType_t by definition
-                unsafe{ core::mem::transmute(*self as u32)}
+                *self as u32
             }
         }
     };

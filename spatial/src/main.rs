@@ -4,11 +4,11 @@
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
-use embassy_futures::join::join3;
+use embassy_futures::join::{join, join3};
 use embassy_stm32::i2c::I2c;
 use embassy_stm32::time::Hertz;
 use embassy_stm32::{Config, bind_interrupts, i2c, peripherals, usb};
-use embassy_time::Timer;
+use embassy_time::{Delay, Timer};
 use embassy_usb::Builder;
 use panic_probe as _;
 
@@ -25,6 +25,7 @@ bind_interrupts!(struct Irqs {
 });
 
 type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
+type EmbassyI2c = embassy_stm32::i2c::I2c<'static, embassy_stm32::mode::Blocking, embassy_stm32::i2c::Master>;
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -55,46 +56,8 @@ async fn main(spawner: Spawner) {
     i2c_cfg.frequency = Hertz::khz(400);
     i2c_cfg.scl_pullup = false;
     i2c_cfg.sda_pullup = false;
-    let i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB7, i2c_cfg);
 
-    let mut i2c_iface = tle493d::i2c::I2cInterface::new(i2c);
-    let mut regmap = [0; tle493d::types::W2B6::REG_MAP_SIZE];
-    let vtbl = i2c_iface.vtable_copy();
-    let mut tle =
-        tle493d::Tlx493d::new(tle493d::types::W2B6::A0, &mut regmap, &mut i2c_iface, &vtbl)
-            .unwrap();
-    let read_sensor = async move {
-        loop {
-            Timer::after_millis(400).await;
-            let field = tle.get_magnetic_field().unwrap();
-            defmt::info!("measured field: {}", &field);
-        }
-    };
-
-    // let mut mag = TLE493DW2B6::new(
-    //     i2c,
-    //     tle493d::registers::DeviceId::A0,
-    //     embassy_time::Delay,
-    //     tle493d::Config {
-    //         temp_compensation: tle493d::registers::TemperatureCompensation::NoCompensation,
-    //         disable_temp: false,
-    //         update_rate: tle493d::registers::UpdateRate::F97Hz,
-    //         trigger_options: tle493d::registers::TriggerOptions::NoTrigger,
-    //         short_range: false,
-    //     },
-    // )
-    // .await
-    // .inspect_err(|e| defmt::error!("error creating: {}", Debug2Format(e)))
-    // .unwrap();
-
-    // let mut mag =  TLE493DW2B6::new_unconfigured(i2c, DeviceId::A0, embassy_time::Delay).await;
-    // let r = mag.try_read_raw_measurement().await;
-    // defmt::info!("{}", Debug2Format(&r));
-
-    // Timer::after_millis(100).await;
-    // defmt::info!("created, awaited");
-    // let x = mag.try_read_raw_measurement().await;
-    // defmt::info!("mes={}", Debug2Format(&x));
+    let tle_i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB7, i2c_cfg);
 
     // ===== USB setup =====
 
@@ -133,23 +96,19 @@ async fn main(spawner: Spawner) {
         )
     };
 
-    // let x = OrientationModule::new(&mut usb_builder, &mut storage);
-    // static mut STORAGE:
-    //     <OrientationModule<Driver<'_, peripherals::USB_OTG_FS>> as Module>::Storage =
-    //     OrientationModuleStaticStorage::new();
-    // OrientationModule::initialize(OrientationModuleConfig::new(&mut usb_builder), &mut STORAGE);
-    // let mod1 = init_module!(OrientationModule<'static, Driver> : OrientationModuleConfig::new(&mut usb_builder));
-
-    let modules = create_modules(&mut usb_builder);
+    let modules = create_modules(&mut usb_builder, tle_i2c);
 
     let mut dev = usb_builder.build();
     debug!("buffer usage: {}", dev.buffer_usage());
 
-    join3(dev.run(), modules.run(&spawner), read_sensor).await;
+    join(dev.run(), modules.run(&spawner)).await;
     // x.run
 }
 
-fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleCollection + use<> {
+fn create_modules(
+    usb_builder: &mut Builder<'static, Driver>,
+    i2c_tle: EmbassyI2c,
+) -> impl ModuleCollection + use<> {
     let hid_module = init_module!(
         UsbHidProvider<'static, Driver, {spatial::usb::INPUT_BUFFER_SIZE}, {spatial::usb::OUTPUT_BUFFER_SIZE}> :
         UsbHidProviderBuilder::new(usb_builder)
@@ -160,7 +119,7 @@ fn create_modules(usb_builder: &mut Builder<'static, Driver>) -> impl ModuleColl
 
     init_module!(
         hid_module,;
-        OrientationModule : OrientationModuleConfig::new(sink),
+        OrientationModule<EmbassyI2c> : OrientationModuleConfig::new(sink, i2c_tle),
         StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder, sink),
     )
 }

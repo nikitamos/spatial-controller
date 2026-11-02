@@ -27,14 +27,18 @@ async fn fetch_readings<I: I2c + 'static>(
     mut sensor: Tlx493d<'static, I>,
 ) {
     let mut prev_angles = Vec3::ZERO;
-
+    let mut prev_smoothed: Vec3 = Vec3::ZERO;
     const ALPHA: f32 = 0.6;
     loop {
         Timer::after_millis(100).await;
         match sensor.get_magnetic_field_and_temperature() {
             Ok((field, x)) => {
                 defmt::debug!("B={}, t={}", field, x);
-                let f = glam::Vec3::from(field).normalize();
+                // TODO: NaN detection
+                let x = glam::Vec3::from(field).normalize();
+                let f = x; // ALPHA * x + prev_smoothed * (1.0 - ALPHA);
+                // prev_smoothed = f;
+                defmt::debug!("F={}", &f.to_array());
 
                 let yaw = libm::atan2f(-f.x, -f.z); // radians, around +Y
                 let pitch = libm::asinf(f.y.clamp(-1.0, 1.0)); // radians, around +X (clamp for FP safety)
@@ -43,6 +47,7 @@ async fn fetch_readings<I: I2c + 'static>(
                 // convert to degrees
                 let euler = Vec3::new(pitch, yaw, roll) * 180.0 / f32::consts::PI;
                 let d = euler - prev_angles;
+                defmt::debug!("re={}", &d.to_array());
                 sender.send(Rotation {
                     rx: d.x as i16,
                     ry: d.y as i16,
@@ -69,36 +74,28 @@ impl<'m, I: I2c + 'static> ModuleBuilder for OrientationModuleConfig<I> {
         // let i2c = storage.i2c.insert(self.i2c);
         Self::Target {
             sink: self.sink,
-            tle: self.tle //Tlx493d::new(Sensor::A0, &mut storage.regmap, i2c, &storage.vtbl).unwrap(),
+            tle: self.tle, //Tlx493d::new(Sensor::A0, &mut storage.regmap, i2c, &storage.vtbl).unwrap(),
         }
     }
 }
 
 impl<I: I2c> OrientationModuleConfig<I> {
-    pub fn new(
-        sink: &'static UsbHidSink,
-        tle: Tlx493d<'static, I>,
-    ) -> Self {
-        Self {
-            sink,
-            tle,
-        }
+    pub fn new(sink: &'static UsbHidSink, tle: Tlx493d<'static, I>) -> Self {
+        Self { sink, tle }
     }
 }
 
 pub struct OrientationModuleStaticStorage<I: I2c> {
-    _p: PhantomData<I>
-    // vtbl: I2cInterfaceVTable<I>,
-    // regmap: <Sensor as SensorType>::RegMap,
-    // i2c: Option<I2cInterface<I>>,
+    _p: PhantomData<I>, // vtbl: I2cInterfaceVTable<I>,
+                        // regmap: <Sensor as SensorType>::RegMap,
+                        // i2c: Option<I2cInterface<I>>,
 }
 
 impl<I: I2c> StaticStorage for OrientationModuleStaticStorage<I> {
     const DEFAULT: Self = Self {
-        _p: PhantomData
-        // vtbl: I2cInterfaceVTable::new(),
-        // regmap: [0; <Sensor as SensorType>::REG_MAP_SIZE],
-        // i2c: None,
+        _p: PhantomData, // vtbl: I2cInterfaceVTable::new(),
+                         // regmap: [0; <Sensor as SensorType>::REG_MAP_SIZE],
+                         // i2c: None,
     };
 }
 

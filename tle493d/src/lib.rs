@@ -19,12 +19,15 @@ impl BoolExt for bool {
     }
 }
 
-use core::marker::PhantomData;
+use core::{ffi::CStr, marker::PhantomData};
 
 use embedded_hal::{delay::DelayNs, i2c::I2c};
 
 use crate::{
-    bindings::{TLx493D_MeasurementType_t, TLx493D_t},
+    bindings::{
+        TLx493D_IICAddressType_t, TLx493D_MeasurementType_t, TLx493D_PowerModeType_t,
+        TLx493D_SensitivityType_t, TLx493D_TriggerType_t, TLx493D_UpdateRateType_t, TLx493D_t,
+    },
     types::SensorType,
 };
 
@@ -76,7 +79,7 @@ pub struct Tlx493d<'m, I: I2c> {
 #[repr(u8)]
 /// Defines the different measurement types of the sensors.
 /// You have to make sure that you are using a mode which is available for
-/// your used sensor family (1st Gen, 2nd Gen, etc.).
+/// your used sensor family
 pub enum MeasurementType {
     /// 1st and 2nd generation
     BxByBz = TLx493D_MeasurementType_t::TLx493D_BxByBz_e as u8,
@@ -93,8 +96,116 @@ pub enum MeasurementType {
     BzTemp = TLx493D_MeasurementType_t::TLx493D_BzTemp_e as u8,
 }
 
-/// Represents the magnetic field in millitesla or raw magnetometer
-/// units. Currently it is an alias to array, where magnetic field
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the different trigger modes of the sensors.
+/// You have to make sure that you are using a type which is available for
+/// your used sensor family
+pub enum TriggerType {
+    /// 1st and 2nd generation
+    NoAdcOnRead = TLx493D_TriggerType_t::TLx493D_NO_ADC_ON_READ_e as u8,
+    /// 1st and 2nd generation
+    AdcOnReadBeforeFirstMsb = TLx493D_TriggerType_t::TLx493D_ADC_ON_READ_BEFORE_FIRST_MSB_e as u8,
+    /// 1st and 2nd generation
+    AdcOnReadAfterReg05 = TLx493D_TriggerType_t::TLx493D_ADC_ON_READ_AFTER_REG_05_e as u8,
+
+    /// 3rd generation only
+    NoTrigger = TLx493D_TriggerType_t::TLx493D_NO_TRIGGER_e as u8,
+    /// 3rd generation only
+    AdcOnRead = TLx493D_TriggerType_t::TLx493D_ADC_ON_READ_e as u8,
+    /// 3rd generation only
+    AdcOnStopCondition = TLx493D_TriggerType_t::TLx493D_ADC_ON_STOP_CONDITION_e as u8,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the different sensitivity ranges of the sensors.
+pub enum SensitivityType {
+    FullRange = TLx493D_SensitivityType_t::TLx493D_FULL_RANGE_e as u8,
+    ShortRange = TLx493D_SensitivityType_t::TLx493D_SHORT_RANGE_e as u8,
+    ExtraShortRange = TLx493D_SensitivityType_t::TLx493D_EXTRA_SHORT_RANGE_e as u8,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the possible I2C addresses of the sensors.
+pub enum I2CAddressType {
+    A0 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A0_e as u8,
+    A1 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A1_e as u8,
+    A2 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A2_e as u8,
+    A3 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A3_e as u8,
+    A4 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A4_e as u8,
+    A5 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A5_e as u8,
+    A6 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A6_e as u8,
+    A7 = TLx493D_IICAddressType_t::TLx493D_IIC_ADDR_A7_e as u8,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the different power modes of the sensors.
+/// The available ones are depending on the sensor variant that you are using.
+pub enum PowerMode {
+    PowerDown = TLx493D_PowerModeType_t::TLx493D_POWER_DOWN_MODE_e as u8,
+    Fast = TLx493D_PowerModeType_t::TLx493D_FAST_MODE_e as u8,
+    LowPower = TLx493D_PowerModeType_t::TLx493D_LOW_POWER_MODE_e as u8,
+    UltraLowPower = TLx493D_PowerModeType_t::TLx493D_ULTRA_LOW_POWER_MODE_e as u8,
+    MasterControlled = TLx493D_PowerModeType_t::TLx493D_MASTER_CONTROLLED_MODE_e as u8,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+/// Defines the different update rates of the sensors.
+/// The available rates depend on the sensor variant.
+pub enum UpdateRate {
+    /// 2nd generation
+    Fast = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_FAST_e as u8,
+    /// 2nd generation
+    Slow = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_SLOW_e as u8,
+    /// 2nd generation
+    Hz770 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_770_HZ_e as u8,
+    /// 2nd generation
+    Hz97 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_97_HZ_e as u8,
+    /// 2nd generation
+    Hz24 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_24_HZ_e as u8,
+    /// 2nd generation
+    Hz12 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_12_HZ_e as u8,
+    /// 2nd generation
+    Hz6 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_6_HZ_e as u8,
+    /// 2nd generation
+    Hz3 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_3_HZ_e as u8,
+    /// 2nd generation
+    Hz0_4 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_0_4_HZ_e as u8,
+    /// 2nd generation
+    Hz0_05 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_0_05_HZ_e as u8,
+
+    /// 3rd generation
+    Hz1000 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_1000_HZ_e as u8,
+    /// 3rd generation
+    Hz125 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_125_HZ_e as u8,
+    /// 3rd generation
+    Hz31 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_31_HZ_e as u8,
+    /// 3rd generation
+    Hz16 = TLx493D_UpdateRateType_t::TLx493D_UPDATE_RATE_16_HZ_e as u8,
+}
+
+/// Describes the wake-up threshold values of the sensor.
+/// If one of thresholds is exceeded, the sensor will trigger
+/// an interrupt.
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct WakeUpThreshold<T: PartialOrd + PartialEq> {
+    /// Lower threshold value
+    pub low: T,
+    /// Upper threshold value
+    pub high: T,
+}
+
+/// Represents the magnetic field in millitesla (with `T` = [`Float`]) or raw magnetometer
+/// units (with `T = i16`). Currently it is an alias to array, where magnetic field
 /// components are laid in conventional order (Bx, By, Bz).
 pub type MagneticField<T = i16> = [T; 3];
 
@@ -104,7 +215,7 @@ pub type MagneticField<T = i16> = [T; 3];
 /// for embedded platforms to have hardware support of
 /// single-precision floats.
 ///
-/// Please not that original Infineon's C library uses
+/// Please note that original Infineon's C library uses
 /// `double` exclusively, so some features may behave
 /// oddly with `f32`. `f64` can be enabled by the
 /// `use-f64` feature.
@@ -243,6 +354,185 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         }
     }
 
+    /// Sets the trigger type for the sensor.
+    pub fn set_trigger(&mut self, trigger: TriggerType) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setTrigger(&mut self.tle, trigger as TLx493D_TriggerType_t::Type)
+                .ok_or_unknown(())
+        }
+    }
+
+    /// Sets the sensitivity range of the sensor.
+    pub fn set_sensitivity(&mut self, range: SensitivityType) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setSensitivity(
+                &mut self.tle,
+                range as TLx493D_SensitivityType_t::Type,
+            )
+            .ok_or_unknown(())
+        }
+    }
+
+    /// Sets the I2C address of the sensor.
+    pub fn set_i2c_address(&mut self, addr: I2CAddressType) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setIICAddress(&mut self.tle, addr as TLx493D_IICAddressType_t::Type)
+                .ok_or_unknown(())
+        }
+    }
+
+    /// Enables collision avoidance for the sensor.
+    pub fn enable_collision_avoidance(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_enableCollisionAvoidance(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Disables collision avoidance for the sensor.
+    pub fn disable_collision_avoidance(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_disableCollisionAvoidance(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Enables interrupts for the sensor.
+    pub fn enable_interrupt(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_enableInterrupt(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Disables interrupts for the sensor.
+    pub fn disable_interrupt(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_disableInterrupt(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Sets the power mode of the sensor.
+    pub fn set_power_mode(&mut self, mode: PowerMode) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setPowerMode(&mut self.tle, mode as TLx493D_PowerModeType_t::Type)
+                .ok_or_unknown(())
+        }
+    }
+
+    /// Sets the update rate of the sensor.
+    pub fn set_update_rate(&mut self, rate: UpdateRate) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setUpdateRate(&mut self.tle, rate as TLx493D_UpdateRateType_t::Type)
+                .ok_or_unknown(())
+        }
+    }
+
+    /// Checks whether the sensor currently holds valid measurement data.
+    pub fn has_valid_data(&mut self) -> bool {
+        unsafe { bindings::tlx493d_hasValidData(&mut self.tle) }
+    }
+
+    /// Checks whether the sensor is functional. It checks parity
+    /// bits in the sensor's registers
+    ///
+    /// Returns `Ok(())` if parity is correct and `Err(_)` otherwise.
+    pub fn is_functional(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_isFunctional(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Checks whether the sensor supports wake-up functionality.
+    pub fn has_wake_up(&mut self) -> bool {
+        unsafe { bindings::tlx493d_hasWakeUp(&mut self.tle) }
+    }
+
+    /// Checks whether wake-up mode is enabled.
+    pub fn is_wake_up_enabled(&mut self) -> bool {
+        unsafe { bindings::tlx493d_isWakeUpEnabled(&mut self.tle) }
+    }
+
+    /// Enables wake-up mode.
+    pub fn enable_wake_up_mode(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_enableWakeUpMode(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Disables wake-up mode.
+    pub fn disable_wake_up_mode(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_disableWakeUpMode(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Sets the wake-up thresholds as raw integer values for each axis.
+    pub fn set_wake_up_thresholds_as_integer(
+        &mut self,
+        x: WakeUpThreshold<i16>,
+        y: WakeUpThreshold<i16>,
+        z: WakeUpThreshold<i16>,
+    ) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setWakeUpThresholdsAsInteger(
+                &mut self.tle,
+                x.low,
+                x.high,
+                y.low,
+                y.high,
+                z.low,
+                z.high,
+            )
+            .ok_or_unknown(())
+        }
+    }
+
+    /// Sets the wake-up thresholds in mT for each axis.
+    /// `temperature` is used for derating the field values.
+    pub fn set_wake_up_thresholds(
+        &mut self,
+        temperature: Float,
+        x: WakeUpThreshold<Float>,
+        y: WakeUpThreshold<Float>,
+        z: WakeUpThreshold<Float>,
+    ) -> Result<()> {
+        unsafe {
+            bindings::tlx493d_setWakeUpThresholds(
+                &mut self.tle,
+                temperature,
+                x.low,
+                x.high,
+                y.low,
+                y.high,
+                z.low,
+                z.high,
+            )
+            .ok_or_unknown(())
+        }
+    }
+
+    /// Performs a software reset of the sensor.
+    /// 
+    /// This function is available for generation 3 sensors only.
+    pub fn software_reset(&mut self) -> Result<()> {
+        unsafe { bindings::tlx493d_softwareReset(&mut self.tle).ok_or_unknown(()) }
+    }
+
+    /// Returns the sensor type as a string.
+    pub fn get_type(&self) -> &str {
+        let ptr = unsafe { bindings::tlx493d_getTypeAsString(&self.tle) };
+        unsafe { CStr::from_ptr(ptr) }.to_str().unwrap_or("")
+    }
+
+    /// Calculates the raw magnetic field values at the given temperature.
+    /// Magnetic field is supplied in millitesla.
+    pub fn calculate_raw_magnetic_field_at_temperature(
+        &mut self,
+        raw_temp: i16,
+        sens: SensitivityType,
+        field: MagneticField<Float>,
+    ) -> MagneticField {
+        let mut raw_field = [0; 3];
+        unsafe {
+            bindings::tlx493d_calculateRawMagneticFieldAtTemperature(
+                &mut self.tle,
+                raw_temp,
+                sens as TLx493D_SensitivityType_t::Type,
+                field[0],
+                field[1],
+                field[2],
+                &mut raw_field[0],
+                &mut raw_field[1],
+                &mut raw_field[2],
+            );
+        }
+        raw_field
+    }
+
     /// Performs reset of the sensor. This function is equivalent
     /// to calling [`i2c::bus_reset`] and then [`Self::set_default_config`].
     /// Result of the latter call is returned.
@@ -261,8 +551,6 @@ impl<'m, I: I2c> Tlx493d<'m, I> {
         i2c::bus_reset(&mut bus.i2c, delay);
         self.set_default_config()
     }
-
-    // TODO: set measurement, set trigger, sensitivity, default config, i2c address, collision avoidance
 }
 
 pub mod reverse_bindings;

@@ -12,6 +12,7 @@ use crate::{
 };
 
 #[unsafe(no_mangle)]
+#[allow(non_upper_case_globals)]
 unsafe extern "C" fn tlx493d_transfer(
     sensor: *mut TLx493D_t,
     tx_buffer: *mut u8,
@@ -48,6 +49,7 @@ unsafe extern "C" fn tlx493d_transfer(
 }
 
 #[unsafe(no_mangle)]
+#[allow(non_upper_case_globals)]
 unsafe extern "C" fn tlx493d_setReadAddress(sensor: *mut TLx493D_t, address: u8) {
     unsafe {
         let sensor = sensor.as_mut_unchecked();

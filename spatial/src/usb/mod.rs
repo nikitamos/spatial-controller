@@ -1,5 +1,7 @@
+use core::any::{Any, type_name};
+
 use docking::reports::{HidReport, HidReportPacket};
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
+use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel, signal::Signal};
 use embassy_time::Timer;
 use embassy_usb::{
     Builder,
@@ -29,8 +31,8 @@ impl<'s> StaticStorage for UsbHidStorage<'s> {
     const DEFAULT: Self = Self {
         state: State::new(),
         comm: UsbHidSink {
-            tx: Signal::new(),
-            rx: Signal::new(),
+            tx: Channel::new(),
+            rx: Channel::new(),
         },
         report_descriptor: [0; REPORT_DESCRIPTOR_SIZE],
     };
@@ -41,10 +43,16 @@ pub struct UsbHidProvider<'d, D: Driver<'d>, const READ_N: usize, const WRITE_N:
     comm: &'static UsbHidSink,
 }
 
-#[derive(Default)]
+// #[derive(Default)]
 pub struct UsbHidSink {
-    tx: Signal<CriticalSectionRawMutex, (InputBuffer, usize)>,
-    rx: Signal<CriticalSectionRawMutex, OutputBuffer>,
+    tx: Channel<CriticalSectionRawMutex, (InputBuffer, usize), 8>,
+    rx: Channel<CriticalSectionRawMutex, OutputBuffer, 4>,
+}
+
+impl Default for UsbHidSink {
+    fn default() -> Self {
+        Self { tx: Channel::new(), rx: Channel::new() }
+    }
 }
 
 impl UsbHidSink {
@@ -62,12 +70,14 @@ impl UsbHidSink {
         } else {
             let end = bytes.len();
             buf[..end].copy_from_slice(bytes);
-            self.tx.signal((buf, end));
+            if let Err(embassy_sync::channel::TrySendError::Full(_msg)) = self.tx.try_send((buf, end)) { 
+                defmt::error!("failed to send report `{}`: queue is overfull", type_name::<T>());
+            }
         }
     }
 
     async fn recv_from_device(&self) -> (InputBuffer, usize) {
-        self.tx.wait().await
+        self.tx.receive().await
     }
 }
 
@@ -85,7 +95,6 @@ where
     pub async fn serve(&mut self) -> ! {
         let comm = self.comm();
         loop {
-            Timer::after_millis(self.sleep_ms()).await;
             let (value, size) = comm.recv_from_device().await;
             if let Err(e) = self.rw.write(&value[..size]).await {
                 defmt::error!("Failed to send report: {}", e);

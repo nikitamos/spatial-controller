@@ -5,7 +5,9 @@ use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_futures::join::{join, join3};
+use embassy_stm32::exti::{ExtiInput, self};
 use embassy_stm32::i2c::I2c;
+use embassy_stm32::mode::Async;
 use embassy_stm32::time::Hertz;
 use embassy_stm32::{Config, bind_interrupts, i2c, peripherals, usb};
 use embassy_time::{Delay, Timer};
@@ -24,7 +26,9 @@ use tle493d::types::{SensorType, W2B6};
 
 bind_interrupts!(struct Irqs {
     OTG_FS => usb::InterruptHandler<peripherals::USB_OTG_FS>;
+    EXTI0 => exti::InterruptHandler<embassy_stm32::interrupt::typelevel::EXTI0>;
 });
+
 
 type Driver = embassy_stm32::usb::Driver<'static, peripherals::USB_OTG_FS>;
 type EmbassyI2c =
@@ -68,13 +72,15 @@ async fn main(spawner: Spawner) {
         static VTABLE: I2cInterfaceVTable<EmbassyI2c> = I2cInterfaceVTable::new();
         static mut I2_IFACE: Option<I2cInterface<EmbassyI2c>> = None;
         let i2c = unsafe { I2_IFACE.insert(I2cInterface::new(i2c)) };
-        Tlx493d::new(
+        let mut sensor = Tlx493d::new(
             W2B6::A0,
             unsafe { &mut REG_MAP },
             i2c,
             &VTABLE,
         )
-        .unwrap()
+        .unwrap();
+        sensor.set_sensitivity(tle493d::SensitivityType::ShortRange).unwrap();
+        sensor
     };
 
     // ===== USB setup =====
@@ -114,7 +120,8 @@ async fn main(spawner: Spawner) {
         )
     };
 
-    let modules = create_modules(&mut usb_builder, tle);
+    let button = ExtiInput::new(p.PA0, p.EXTI0, embassy_stm32::gpio::Pull::Up, Irqs);
+    let modules = create_modules(&mut usb_builder, tle, button);
 
     let mut dev = usb_builder.build();
     debug!("buffer usage: {}", dev.buffer_usage());
@@ -126,6 +133,7 @@ async fn main(spawner: Spawner) {
 fn create_modules(
     usb_builder: &mut Builder<'static, Driver>,
     tle: Tlx493d<'static, EmbassyI2c>,
+    btn: ExtiInput<'static, Async>
 ) -> impl ModuleCollection + use<> {
     let hid_module = init_module!(
         UsbHidProvider<'static, Driver, {spatial::usb::INPUT_BUFFER_SIZE}, {spatial::usb::OUTPUT_BUFFER_SIZE}> :
@@ -137,7 +145,7 @@ fn create_modules(
 
     init_module!(
         hid_module,;
-        OrientationModule<EmbassyI2c> : OrientationModuleConfig::new(sink, tle),
+        OrientationModule<EmbassyI2c> : OrientationModuleConfig::new(sink, tle, btn),
         StatusModule<'static, Driver> : StatusModuleBuilder::new(usb_builder, sink),
     )
 }
